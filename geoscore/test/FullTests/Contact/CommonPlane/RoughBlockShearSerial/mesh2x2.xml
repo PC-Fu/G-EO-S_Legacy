@@ -1,0 +1,93 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.0125" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <Contact active="1"  cosMinTol="0.6" penetrationTol="0.25">
+    <PenaltyCoulomb stressSoften="20" stressYield="15" aperture="0.01" arealStiffnessShear="15" frictionCoefficient="0.3" normalApproachYield="0.009999"/>
+  </Contact>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.5" >
+      <Apply solver="solver1" toregions="EB1 EB2"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" hgStiff="0.00" elementtype="uniformstrain" hgDamp="0.0">
+        <LinearElasticMaterial ShearModulus="15" Density="2.65" BulkModulus="15"/>
+    </ElementRegion>
+    <ElementRegion name="EB2" hgStiff="0.00" elementtype="uniformstrain" hgDamp="0.0">
+        <LinearElasticMaterial ShearModulus="15" Density="2.65" BulkModulus="15"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK1"
+                            component="1" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK2"
+                            component="1" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK1"
+                            component="0" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK2"
+                            component="0" 
+                            scale="0.0" />
+
+<!--        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="NS1"
+                            component="2" 
+                            scale="-0.1"
+			    timetable="tv"/>
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="NS2"
+                            component="2" 
+                            scale="0.1"
+			    timetable="tv" />
+-->
+  </BoundaryConditions>
+
+  <InitialConditions>
+    <ConstantInitialCondition setnames="BLOCK1" fieldname="Velocity" fieldtype="Vector" object="Node" value="0.0 0.0 -0.05" />
+    <ConstantInitialCondition setnames="BLOCK2" fieldname="Velocity" fieldtype="Vector" object="Node" value="0.0 0.0  0.05" />
+  </InitialConditions>
+
+
+
+  <Tables>
+    <Table1D name="tv"
+               coord = "0.0 0.1 0.2  1.0e9"
+               value = "1.0 1.0 0.0  0.0" />
+    <Table1D name="tv1"
+               coord = "0.0 0.001  1.0e9"
+               value = "1.0    0.0    0.0" />
+    <Table1D name="ts"
+               coord = "0.0 0.00001  1.0e9"
+               value = "1.0    1.0    1.0" />
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  plot_interval="1.0e-3" plotfile_root="output" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

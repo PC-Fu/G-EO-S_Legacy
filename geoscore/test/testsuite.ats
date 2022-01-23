@@ -1,0 +1,4 @@
+log('GPAC Test Suite v 0.0', echo=True)
+source('gpac.ats')
+source('FullTests/FullTests.ats')
+#source('Scaling/Scaling.ats')

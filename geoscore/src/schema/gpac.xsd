@@ -1,0 +1,1848 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ <xsd:annotation>
+  <xsd:documentation xml:lang="en">
+   Input file schema for GPAC
+   Copyright 2013 Lawrence Livermore National Laboratory. All rights reserved.
+   LLNL-CODE-618232
+   GPAC, Version 2.0
+   Contact Scott Johnson (johnson346@llnl.gov) for information.
+  </xsd:documentation>
+ </xsd:annotation>
+
+ <!-- Physical units -->
+ <xsd:simpleType name="unittype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="(-?\d*(\.\d*)?(e-?\d+)?(\s+\S+^?\S*/?\S*)?)?($:(\S+))?"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+
+ <!-- Array data -->
+ <xsd:simpleType name="arraytype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="\s*(-?\d*(\.\d*)?(e-?\d+)?\s*,\s*)*(-?\d*(\.\d*)?(e-?\d+)?)"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+
+ <!-- R1Tensor -->
+ <xsd:simpleType name="tensortype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="\s*(-?\d*(\.\d*)?(e-?\d+)?)\s+(-?\d*(\.\d*)?(e-?\d+)?)\s+(-?\d*(\.\d*)?(e-?\d+)?)"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+ 
+ <!-- Ranges -->
+ <xsd:simpleType name="rangetype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="(\d+(,|-|\s+)?)*\d+"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+
+ <xsd:simpleType name="srangetype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="(\S+(,|-|\s+)?)*\S+"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+ 
+ <!-- Variable units: we may also want to add support for functions -->
+ <xsd:complexType name="VariableValueType">
+    <xsd:attribute name="constant" type="unittype"/>
+    <xsd:attribute name="distribution" type="xsd:string"/>
+ </xsd:complexType>
+
+ <!-- DEFINITION FOR INCLUDES -->
+  <xsd:complexType name="IncludeType">
+   <xsd:attribute name="file" type="xsd:string" use="required"/>
+ </xsd:complexType>
+
+ <!-- IF statements -->
+  <xsd:complexType name="ThenElseType"> 
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:any minOccurs="0"/>
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="IFType">
+    <xsd:sequence>
+      <xsd:element name="Then" type="ThenElseType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="Else" type="ThenElseType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+    <xsd:attribute name="condition" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:group name="IfIncludeOption">
+    <xsd:choice>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="If" type="IFType" />
+        <xsd:element name="Include" type="IncludeType" />
+      </xsd:choice>
+    </xsd:choice>
+  </xsd:group>
+  <!-- To add if/include option: <xs:group ref="IfIncludeOption"/> -->
+ 
+ <!-- BEGIN=====> DEFINITIONS FOR MATERIALS AND CONTACTS -->
+ <xsd:complexType name="LinearElasticOrthotropicType">
+   <!-- LinearElastic -->
+   <xsd:attribute name="E1" type="unittype"/>
+   <xsd:attribute name="E2" type="unittype"/>
+   <xsd:attribute name="E3" type="unittype"/>
+   <xsd:attribute name="G12" type="unittype"/>
+   <xsd:attribute name="G13" type="unittype"/>
+   <xsd:attribute name="G23" type="unittype"/>
+   <xsd:attribute name="nu12" type="unittype"/>
+   <xsd:attribute name="nu13" type="unittype"/>
+   <xsd:attribute name="nu23" type="unittype"/>
+   <!-- MaterialBase -->
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+ <xsd:complexType name="LinearElasticMaterialType">
+   <!-- LinearElastic -->
+   <!-- LinearElasticIntermediate -->
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="density" type="unittype"/>
+   <xsd:attribute name="ElasticBulkModulus" type="unittype"/>
+   <xsd:attribute name="ElasticShearModulus" type="unittype"/>
+   <!-- MaterialBase -->
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="DamageSphericalPoresMaterialType">
+   <!-- DamageSphericalPores -->
+   <xsd:attribute name="crackInitiationYield" type="unittype"/>
+   <xsd:attribute name="crackPropgationYield" type="unittype"/>
+   <xsd:attribute name="initialVoidRatio" type="unittype"/>
+   <xsd:attribute name="radiusRatio" type="unittype"/>
+   <xsd:attribute name="fractureNumberDensity" type="unittype"/>
+   <xsd:attribute name="yAffinity" type="unittype"/>
+   <xsd:attribute name="gAffinity" type="unittype"/>
+   <xsd:attribute name="chordLengthVariance" type="unittype"/>
+   <xsd:attribute name="M01" type="unittype"/>
+   <xsd:attribute name="M02" type="unittype"/>
+   <xsd:attribute name="M11" type="unittype"/>
+   <xsd:attribute name="M12" type="unittype"/>
+   <xsd:attribute name="M21" type="unittype"/>
+   <xsd:attribute name="M22" type="unittype"/>
+   <!-- LinearElasticIntermediate -->
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="density" type="unittype"/>
+   <xsd:attribute name="ElasticBulkModulus" type="unittype"/>
+   <xsd:attribute name="ElasticShearModulus" type="unittype"/>
+   <!-- MaterialBase -->
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="LinearElasticDEMMaterialType">
+   <!-- LinearElasticDEM -->
+   <xsd:attribute name="yieldStrength" type="unittype"/>
+   <xsd:attribute name="coefficientOfRestitution" type="unittype"/>
+   <xsd:attribute name="velocityOfCoROfHalf" type="unittype"/>
+   <xsd:attribute name="cementBondStrength" type="unittype"/>
+   <xsd:attribute name="surfaceEnergy" type="unittype"/>
+   <!-- MaterialBase -->
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="GeodynMaterialType">
+   <xsd:attribute name="file" type="xsd:string" use="required"/>
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <!-- Geodyn -->
+   <!-- GeodynIntermediate
+   <xsd:attribute name="rho" type="unittype"/>
+   <xsd:attribute name="e" type="unittype"/>
+   <xsd:attribute name="poro" type="unittype"/>
+   <xsd:attribute name="poro1" type="unittype"/>
+   <xsd:attribute name="poro2" type="unittype"/>
+   <xsd:attribute name="poro3" type="unittype"/>
+   <xsd:attribute name="poro_unloaded" type="unittype"/>
+   <xsd:attribute name="poroder" type="unittype"/>
+   <xsd:attribute name="pporomult" type="unittype"/>
+   <xsd:attribute name="Kporomult" type="unittype"/>
+   <xsd:attribute name="Pc" type="unittype"/>
+   <xsd:attribute name="pmin" type="unittype"/>
+   <xsd:attribute name="pmax" type="unittype"/>
+   <xsd:attribute name="burn_fraction" type="unittype"/>
+   <xsd:attribute name="plastic_strain" type="unittype"/>
+   <xsd:attribute name="hardening" type="unittype"/>
+   <xsd:attribute name="bulking_porosity" type="unittype"/>
+   <xsd:attribute name="Yf1" type="unittype"/>
+   <xsd:attribute name="damage1" type="unittype"/>
+   <xsd:attribute name="damage2" type="unittype"/>
+   <xsd:attribute name="p" type="unittype"/>
+   <xsd:attribute name="c" type="unittype"/>
+   <xsd:attribute name="temperature" type="unittype"/>
+   <xsd:attribute name="K" type="unittype"/>
+   <xsd:attribute name="kappa_p" type="unittype"/>
+   <xsd:attribute name="kappa_r" type="unittype"/>
+   <xsd:attribute name="c_v" type="unittype"/>
+   <xsd:attribute name="rho_solid" type="unittype"/>
+   <xsd:attribute name="Y" type="unittype"/>
+   <xsd:attribute name="Yp" type="unittype"/>
+   <xsd:attribute name="Ystrainterm" type="unittype"/>
+   <xsd:attribute name="Ylodeangleterm" type="unittype"/>
+   <xsd:attribute name="G" type="unittype"/>
+   <xsd:attribute name="dev_Be" type="unittype"/>
+   <xsd:attribute name="dev_s" type="unittype"/>
+   <xsd:attribute name="plastic_lambda" type="unittype"/>
+   <xsd:attribute name="T_T11" type="unittype"/>
+   <xsd:attribute name="T_T22" type="unittype"/>
+   <xsd:attribute name="T_T33" type="unittype"/>
+   <xsd:attribute name="T_T12" type="unittype"/>
+   <xsd:attribute name="T_T23" type="unittype"/>
+   <xsd:attribute name="T_T31" type="unittype"/>
+   <xsd:attribute name="cl" type="unittype"/>
+   <xsd:attribute name="ct" type="unittype"/>
+   <xsd:attribute name="lode_angle" type="unittype"/>
+   <xsd:attribute name="vol_solid" type="unittype"/>
+   <xsd:attribute name="dpstrain" type="unittype"/>
+   <xsd:attribute name="dpw" type="unittype"/>
+   <xsd:attribute name="sec" type="unittype"/>
+   <xsd:attribute name="trace_Be" type="unittype"/>
+   <xsd:attribute name="fluid_poro" type="unittype"/>
+   <xsd:attribute name="fluid_pres" type="unittype"/>
+   <xsd:attribute name="mix_pres" type="unittype"/>
+   <xsd:attribute name="eff_mix_pres" type="unittype"/>
+   <xsd:attribute name="eff_pres" type="unittype"/>
+   <xsd:attribute name="saturation" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <xsd:attribute name="connected_poro" type="unittype"/>
+   <xsd:attribute name="subtracted_elastic_shear_energy" type="unittype"/>
+   <xsd:attribute name="activity" type="unittype"/>
+   <xsd:attribute name="W_0" type="unittype"/>
+   <xsd:attribute name="W_1" type="unittype"/>
+   <xsd:attribute name="W_2" type="unittype"/>
+   <xsd:attribute name="q_0" type="unittype"/>
+   <xsd:attribute name="q_1" type="unittype"/>
+   <xsd:attribute name="q_2" type="unittype"/>
+   <xsd:attribute name="q_3" type="unittype"/>
+   <xsd:attribute name="q_4" type="unittype"/>
+   <xsd:attribute name="q_5" type="unittype"/>
+   <xsd:attribute name="q_6" type="unittype"/>
+   <xsd:attribute name="q_7" type="unittype"/>
+   <xsd:attribute name="q_8" type="unittype"/>
+   <xsd:attribute name="q_9" type="unittype"/>
+   <xsd:attribute name="D_T11" type="unittype"/>
+   <xsd:attribute name="D_T22" type="unittype"/>
+   <xsd:attribute name="D_T33" type="unittype"/>
+   <xsd:attribute name="D_T12" type="unittype"/>
+   <xsd:attribute name="D_T23" type="unittype"/>
+   <xsd:attribute name="D_T31" type="unittype"/>
+   <xsd:attribute name="Ev_T11" type="unittype"/>
+   <xsd:attribute name="Ev_T22" type="unittype"/>
+   <xsd:attribute name="Ev_T33" type="unittype"/>
+   <xsd:attribute name="Ev_T12" type="unittype"/>
+   <xsd:attribute name="Ev_T23" type="unittype"/>
+   <xsd:attribute name="Ev_T31" type="unittype"/>
+   <xsd:attribute name="e_coldcurve" type="unittype"/>
+   <xsd:attribute name="e_meltcurve" type="unittype"/>
+   <xsd:attribute name="pressure_term" type="unittype"/>
+   <xsd:attribute name="temp_term" type="unittype"/>
+   <xsd:attribute name="Tmax" type="unittype"/>
+   <xsd:attribute name="Tint" type="unittype"/>
+   <xsd:attribute name="Tmin" type="unittype"/>
+   <xsd:attribute name="Tmaxhistory" type="unittype"/>
+   <xsd:attribute name="Tminhistory" type="unittype"/>
+   <xsd:attribute name="overb" type="unittype"/>
+   <xsd:attribute name="pressure_cutoff" type="unittype"/>
+   <xsd:attribute name="friction_slope" type="unittype"/>
+   <xsd:attribute name="ref_poro1" type="unittype"/>
+   <xsd:attribute name="ref_poro2" type="unittype"/>
+   <xsd:attribute name="modulus_reduction_factor" type="unittype"/>
+   <xsd:attribute name="phase" type="unittype"/>
+   <xsd:attribute name="n_0" type="unittype"/>
+   <xsd:attribute name="n_1" type="unittype"/>
+   <xsd:attribute name="n_2" type="unittype"/>
+   <xsd:attribute name="melt_term" type="unittype"/>
+   <xsd:attribute name="Be_T11" type="unittype"/>
+   <xsd:attribute name="Be_T22" type="unittype"/>
+   <xsd:attribute name="Be_T33" type="unittype"/>
+   <xsd:attribute name="Be_T12" type="unittype"/>
+   <xsd:attribute name="Be_T23" type="unittype"/>
+   <xsd:attribute name="Be_T31" type="unittype"/>
+   <xsd:attribute name="L_L11" type="unittype"/>
+   <xsd:attribute name="L_L21" type="unittype"/>
+   <xsd:attribute name="L_L31" type="unittype"/>
+   <xsd:attribute name="L_L12" type="unittype"/>
+   <xsd:attribute name="L_L22" type="unittype"/>
+   <xsd:attribute name="L_L32" type="unittype"/>
+   <xsd:attribute name="L_L13" type="unittype"/>
+   <xsd:attribute name="L_L23" type="unittype"/>
+   <xsd:attribute name="L_L33" type="unittype"/>
+   <xsd:attribute name="v_0" type="unittype"/>
+   <xsd:attribute name="v_1" type="unittype"/>
+   <xsd:attribute name="v_2" type="unittype"/>
+   <xsd:attribute name="v_mag" type="unittype"/>
+   <xsd:attribute name="e_kin" type="unittype"/>
+   <xsd:attribute name="e_tot" type="unittype"/>
+   <xsd:attribute name="e_flux_0" type="unittype"/>
+   <xsd:attribute name="e_flux_1" type="unittype"/>
+   <xsd:attribute name="e_flux_2" type="unittype"/>
+   <xsd:attribute name="vf" type="unittype"/>
+   <xsd:attribute name="dx_0" type="unittype"/>
+   <xsd:attribute name="dx_1" type="unittype"/>
+   <xsd:attribute name="dx_2" type="unittype"/>
+   <xsd:attribute name="dt" type="unittype"/>
+   <xsd:attribute name="strain_T11" type="unittype"/>
+   <xsd:attribute name="strain_T22" type="unittype"/>
+   <xsd:attribute name="strain_T33" type="unittype"/>
+   <xsd:attribute name="strain_T12" type="unittype"/>
+   <xsd:attribute name="strain_T23" type="unittype"/>
+   <xsd:attribute name="strain_T31" type="unittype"/>
+   <xsd:attribute name="F_L11" type="unittype"/>
+   <xsd:attribute name="F_L21" type="unittype"/>
+   <xsd:attribute name="F_L31" type="unittype"/>
+   <xsd:attribute name="F_L12" type="unittype"/>
+   <xsd:attribute name="F_L22" type="unittype"/>
+   <xsd:attribute name="F_L32" type="unittype"/>
+   <xsd:attribute name="F_L13" type="unittype"/>
+   <xsd:attribute name="F_L23" type="unittype"/>
+   <xsd:attribute name="F_L33" type="unittype"/>
+   <xsd:attribute name="X_0" type="unittype"/>
+   <xsd:attribute name="X_1" type="unittype"/>
+   <xsd:attribute name="X_2" type="unittype"/>
+   <xsd:attribute name="x_0" type="unittype"/>
+   <xsd:attribute name="x_1" type="unittype"/>
+   <xsd:attribute name="x_2" type="unittype"/>
+   <xsd:attribute name="displacement_0" type="unittype"/>
+   <xsd:attribute name="displacement_1" type="unittype"/>
+   <xsd:attribute name="displacement_2" type="unittype"/>
+   <xsd:attribute name="particle_mom_0" type="unittype"/>
+   <xsd:attribute name="particle_mom_1" type="unittype"/>
+   <xsd:attribute name="particle_mom_2" type="unittype"/>
+   <xsd:attribute name="particle_density" type="unittype"/>
+   <xsd:attribute name="time" type="unittype"/> -->
+   <!-- MaterialBase
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/> -->
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+  <xsd:complexType name="DSIDDamageMaterialType">
+   <!-- DSIDDamage -->
+   <xsd:attribute name="alpha" type="unittype"/>
+   <xsd:attribute name="parameter1" type="unittype"/>
+   <xsd:attribute name="parameter2" type="unittype"/>
+   <xsd:attribute name="parameter3" type="unittype"/>
+   <xsd:attribute name="parameter4" type="unittype"/>
+   <xsd:attribute name="initialDamageThreshold" type="unittype"/>
+   <xsd:attribute name="damageHardeningVariable" type="unittype"/>
+   <!-- MaterialBase -->
+   <xsd:attribute name="Density" type="unittype"/>
+   <xsd:attribute name="E" type="unittype"/>
+   <xsd:attribute name="Nu" type="unittype"/>
+   <xsd:attribute name="ShearModulus" type="unittype"/>
+   <xsd:attribute name="Lame" type="unittype"/>
+   <xsd:attribute name="StressPower" type="unittype"/>
+   <xsd:attribute name="DissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="ElasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="pressure" type="unittype"/>
+   <xsd:attribute name="BulkModulusCurrent" type="unittype"/>
+   <xsd:attribute name="ShearModulusCurrent" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="MaterialType">
+  <xsd:choice>
+   <xsd:element name="LinearElasticMaterial" type="LinearElasticMaterialType"/>
+   <xsd:element name="LinearElasticOrthotropic" type="LinearElasticOrthotropicType"/>
+   <xsd:element name="DamageSphericalPoresMaterial" type="DamageSphericalPoresMaterialType"/>
+   <xsd:element name="LinearElasticDEMMaterial" type="LinearElasticDEMMaterialType"/>
+   <xsd:element name="DSIDDamageMaterial" type="DSIDDamageMaterialType"/>
+   <xsd:element name="GeodynMaterial" type="GeodynMaterialType"/>
+  </xsd:choice>
+  <xsd:attribute name="name" type="xsd:string" use="required"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="MaterialsType">
+  <xsd:sequence>
+   <xsd:element name="Material" type="MaterialType" maxOccurs="unbounded"/>
+  </xsd:sequence>
+ </xsd:complexType>
+  <xsd:complexType name="HeuzeJointType">
+   <!-- HeuzeJoint -->
+   <!-- JointIntermediate -->
+   <xsd:attribute name="gap" type="unittype"/>
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="currentStiffness" type="unittype"/>
+   <xsd:attribute name="dilationStress" type="unittype"/>
+   <xsd:attribute name="shearAtResidual" type="unittype"/>
+   <xsd:attribute name="coefficientOfFrictionAtResidual" type="unittype"/>
+   <xsd:attribute name="cohesion" type="unittype"/>
+   <xsd:attribute name="normalApproachAtYield" type="unittype"/>
+   <xsd:attribute name="plasticStiffness" type="unittype"/>
+   <xsd:attribute name="unloadStiffness" type="unittype"/>
+   <xsd:attribute name="dilationStiffness" type="unittype"/>
+   <xsd:attribute name="dilationCoefficient" type="unittype"/>
+   <xsd:attribute name="shearAtInitiationOfDilation" type="unittype"/>
+   <xsd:attribute name="shearAtLimitOfDilation" type="unittype"/>
+   <xsd:attribute name="normalApproachAtInitiationOfDilation" type="unittype"/>
+   <xsd:attribute name="stressAtLimitOfDilation" type="unittype"/>
+   <xsd:attribute name="elasticStiffnessCoefficient" type="unittype"/>
+   <xsd:attribute name="shearStiffness" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="ItascaJointType">
+   <!-- ItascaJoint -->
+   <!-- JointIntermediate -->
+   <xsd:attribute name="gap" type="unittype"/>
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="currentStiffness" type="unittype"/>
+   <xsd:attribute name="dilationStress" type="unittype"/>
+   <xsd:attribute name="shearAtResidual" type="unittype"/>
+   <xsd:attribute name="coefficientOfFrictionAtResidual" type="unittype"/>
+   <xsd:attribute name="cohesion" type="unittype"/>
+   <xsd:attribute name="normalApproachAtYield" type="unittype"/>
+   <xsd:attribute name="plasticStiffness" type="unittype"/>
+   <xsd:attribute name="unloadStiffness" type="unittype"/>
+   <xsd:attribute name="dilationStiffness" type="unittype"/>
+   <xsd:attribute name="dilationCoefficient" type="unittype"/>
+   <xsd:attribute name="shearAtInitiationOfDilation" type="unittype"/>
+   <xsd:attribute name="shearAtLimitOfDilation" type="unittype"/>
+   <xsd:attribute name="normalApproachAtInitiationOfDilation" type="unittype"/>
+   <xsd:attribute name="stressAtLimitOfDilation" type="unittype"/>
+   <xsd:attribute name="elasticStiffnessCoefficient" type="unittype"/>
+   <xsd:attribute name="shearStiffness" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="PenaltyCoulombType">
+   <!-- PenaltyCoulomb -->
+   <!-- PenaltyCoulombIntermediate -->
+   <xsd:attribute name="aperture" type="unittype"/>
+   <xsd:attribute name="normalApproachYield" type="unittype"/>
+   <xsd:attribute name="arealStiffnessSoften" type="unittype"/>
+   <xsd:attribute name="stressYield" type="unittype"/>
+   <xsd:attribute name="stressSoften" type="unittype"/>
+   <xsd:attribute name="arealStiffnessShear" type="unittype"/>
+   <xsd:attribute name="ktildeAperture" type="unittype"/>
+   <xsd:attribute name="arealStiffnessYield" type="unittype"/>
+   <xsd:attribute name="normalApproachSoften" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="RateAndStateType">
+   <!-- RateAndState -->
+   <!-- RateAndStateIntermediate -->
+   <xsd:attribute name="state" type="unittype"/>
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="stressRate" type="unittype"/>
+   <xsd:attribute name="A" type="unittype"/>
+   <xsd:attribute name="B" type="unittype"/>
+   <xsd:attribute name="shearRateStar" type="unittype"/>
+   <xsd:attribute name="stateStar" type="unittype"/>
+   <xsd:attribute name="Dc" type="unittype"/>
+   <xsd:attribute name="alpha" type="unittype"/>
+   <!-- PenaltyCoulombIntermediate -->
+   <xsd:attribute name="aperture" type="unittype"/>
+   <xsd:attribute name="normalApproachYield" type="unittype"/>
+   <xsd:attribute name="arealStiffnessSoften" type="unittype"/>
+   <xsd:attribute name="stressYield" type="unittype"/>
+   <xsd:attribute name="stressSoften" type="unittype"/>
+   <xsd:attribute name="arealStiffnessShear" type="unittype"/>
+   <xsd:attribute name="ktildeAperture" type="unittype"/>
+   <xsd:attribute name="arealStiffnessYield" type="unittype"/>
+   <xsd:attribute name="normalApproachSoften" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="DieterichType">
+   <!-- Dieterich -->
+   <xsd:attribute name="stressReference" type="unittype"/>
+   <xsd:attribute name="stressRateDrive" type="unittype"/>
+   <xsd:attribute name="shearRateDrive" type="unittype"/>
+   <xsd:attribute name="stressPin" type="unittype"/>
+   <xsd:attribute name="shearStressReference" type="unittype"/>
+   <xsd:attribute name="dstressShear" type="unittype"/>
+   <xsd:attribute name="dstress" type="unittype"/>
+   <xsd:attribute name="shearStressRate" type="unittype"/>
+   <xsd:attribute name="shearStressRateDrive" type="unittype"/>
+   <xsd:attribute name="dshearOverTimestep" type="unittype"/>
+   <xsd:attribute name="porePressure" type="unittype"/>
+   <xsd:attribute name="dPorePressureDt" type="unittype"/>
+   <xsd:attribute name="H" type="unittype"/>
+   <xsd:attribute name="tFail" type="unittype"/>
+   <xsd:attribute name="maxStatePin" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient2" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient2High" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient2aLow" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient2Low" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient3High" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient3Low" type="unittype"/>
+   <xsd:attribute name="KShearSelf" type="unittype"/>
+   <xsd:attribute name="KNormalSelf" type="unittype"/>
+   <xsd:attribute name="shearSlipRateAB" type="unittype"/>
+   <xsd:attribute name="shearStressAtFailure" type="unittype"/>
+   <xsd:attribute name="AReductionFactor" type="unittype"/>
+   <xsd:attribute name="stressOverShootFactor" type="unittype"/>
+   <!-- RateAndStateIntermediate -->
+   <xsd:attribute name="state" type="unittype"/>
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="stressRate" type="unittype"/>
+   <xsd:attribute name="A" type="unittype"/>
+   <xsd:attribute name="B" type="unittype"/>
+   <xsd:attribute name="shearRateStar" type="unittype"/>
+   <xsd:attribute name="stateStar" type="unittype"/>
+   <xsd:attribute name="Dc" type="unittype"/>
+   <xsd:attribute name="alpha" type="unittype"/>
+   <!-- PenaltyCoulombIntermediate -->
+   <xsd:attribute name="aperture" type="unittype"/>
+   <xsd:attribute name="normalApproachYield" type="unittype"/>
+   <xsd:attribute name="arealStiffnessSoften" type="unittype"/>
+   <xsd:attribute name="stressYield" type="unittype"/>
+   <xsd:attribute name="stressSoften" type="unittype"/>
+   <xsd:attribute name="arealStiffnessShear" type="unittype"/>
+   <xsd:attribute name="ktildeAperture" type="unittype"/>
+   <xsd:attribute name="arealStiffnessYield" type="unittype"/>
+   <xsd:attribute name="normalApproachSoften" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="HertzianType">
+   <!-- Hertzian -->
+   <!-- HertzianIntermediate -->
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="dissipatedViscousEnergy" type="unittype"/>
+   <xsd:attribute name="radius" type="unittype"/>
+   <xsd:attribute name="youngsModulus" type="unittype"/>
+   <xsd:attribute name="mass" type="unittype"/>
+   <xsd:attribute name="hertzianCoefficient" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="LinearizedType">
+   <!-- Linearized -->
+   <xsd:attribute name="a0" type="unittype"/>
+   <xsd:attribute name="at" type="unittype"/>
+   <xsd:attribute name="ac" type="unittype"/>
+   <xsd:attribute name="cohesionDistance" type="unittype"/>
+   <xsd:attribute name="dupre" type="unittype"/>
+   <xsd:attribute name="pullOffForce" type="unittype"/>
+   <xsd:attribute name="Tk" type="unittype"/>
+   <xsd:attribute name="coefficientOfRestitution2" type="unittype"/>
+   <xsd:attribute name="yield" type="unittype"/>
+   <xsd:attribute name="halfRestVel" type="unittype"/>
+   <xsd:attribute name="ecrit" type="unittype"/>
+   <xsd:attribute name="fcrit" type="unittype"/>
+   <xsd:attribute name="linearStiffnessElastic" type="unittype"/>
+   <xsd:attribute name="vark2" type="unittype"/>
+   <xsd:attribute name="interfaceEnergy" type="unittype"/>
+   <!-- HertzianIntermediate -->
+   <xsd:attribute name="currentFrictionCoefficient" type="unittype"/>
+   <xsd:attribute name="dissipatedViscousEnergy" type="unittype"/>
+   <xsd:attribute name="radius" type="unittype"/>
+   <xsd:attribute name="youngsModulus" type="unittype"/>
+   <xsd:attribute name="mass" type="unittype"/>
+   <xsd:attribute name="hertzianCoefficient" type="unittype"/>
+   <!-- InterfaceBase -->
+   <xsd:attribute name="shearToNormalStiffnessRatio" type="unittype"/>
+   <xsd:attribute name="frictionCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityInitial" type="unittype"/>
+   <xsd:attribute name="permeabilityShearCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityShearExponent" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalCoefficient" type="unittype"/>
+   <xsd:attribute name="permeabilityNormalExponent" type="unittype"/>
+   <xsd:attribute name="elasticStrainEnergy" type="unittype"/>
+   <xsd:attribute name="dissipatedEnergy" type="unittype"/>
+   <xsd:attribute name="stress" type="unittype"/>
+   <xsd:attribute name="shearStress" type="unittype"/>
+   <xsd:attribute name="normalVelocity" type="unittype"/>
+   <xsd:attribute name="shearVelocity" type="unittype"/>
+   <xsd:attribute name="shear" type="unittype"/>
+   <xsd:attribute name="normalApproach" type="unittype"/>
+   <xsd:attribute name="timestep" type="unittype"/>
+   <xsd:attribute name="permeability" type="unittype"/>
+   <!-- ConstitutiveBase -->
+ </xsd:complexType>
+
+ <xsd:complexType name="ContactType">
+  <xsd:choice>
+   <xsd:element name="HeuzeJoint" type="HeuzeJointType"/>
+   <xsd:element name="ItascaJoint" type="ItascaJointType"/>
+   <xsd:element name="PenaltyCoulomb" type="PenaltyCoulombType"/>
+   <xsd:element name="RateAndState" type="RateAndStateType"/>
+   <xsd:element name="Dieterich" type="DieterichType"/>
+   <xsd:element name="Hertzian" type="HertzianType"/>
+   <xsd:element name="Linearized" type="LinearizedType"/>
+  </xsd:choice>
+  <!--tolerance-->
+  <xsd:attribute name="penetrationTol" type="xsd:double"/>
+  <xsd:attribute name="spatialTol" type="xsd:double"/>
+  <xsd:attribute name="areaTol" type="xsd:double"/>
+  <xsd:attribute name="cosMinTol" type="xsd:double"/>
+  <xsd:attribute name="searchRadiusFactor" type="xsd:double"/>
+  <xsd:attribute name="searchRadiusVelocityFactor" type="xsd:double"/>
+  <xsd:attribute name="feParentSolnTol" type="xsd:double"/>
+  <xsd:attribute name="maximumSeparation" type="unittype"/>
+  <!--options-->
+  <xsd:attribute name="active" type="xsd:integer"/>
+  <xsd:attribute name="smoothed" type="xsd:boolean"/>
+  <xsd:attribute name="allowSelfContact" type="xsd:boolean"/>
+  <xsd:attribute name="ImplicitActive" type="xsd:integer"/>
+  <xsd:attribute name="ThreeDTrue" type="xsd:integer"/>
+  <!--ChoiceOfMethod-->
+  <xsd:attribute name="NitscheFlag" type="xsd:integer"/>
+  <!--MethodParameters-->
+  <xsd:attribute name="PenaltyNormal" type="xsd:double"/>
+  <xsd:attribute name="PenaltyTau1" type="xsd:double"/>
+  <xsd:attribute name="PenaltyTau2" type="xsd:double"/>
+  <xsd:attribute name="NitscheSymmetryFlag" type="xsd:integer"/>
+  <xsd:attribute name="NitscheWeightedFlag" type="xsd:integer"/>
+  <xsd:attribute name="NitscheTau1Flag" type="xsd:integer"/>
+  <xsd:attribute name="NitscheTau2Flag" type="xsd:integer"/>
+  <xsd:attribute name="TractionCutoff" type="xsd:double"/>
+  <!--Stick/SlipBehavior-->
+  <xsd:attribute name="slidingLaw" type="xsd:integer"/>
+  <xsd:attribute name="FrictionCoefficient" type="xsd:double"/>
+  <xsd:attribute name="tracYield" type="xsd:double"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="ContactsType">
+  <xsd:sequence>
+   <xsd:element name="Contact" type="ContactType" maxOccurs="unbounded"/>
+  </xsd:sequence>
+ </xsd:complexType>
+  <!-- END=====> DEFINITIONS FOR MATERIALS AND CONTACTS -->
+
+ 
+ 
+
+
+
+
+ 
+ <!-- DEFINITION FOR RISK SITE -->
+ <xsd:complexType name="GroundMotionModelCoefficientType">
+ 	<xsd:attribute name="index" type="xsd:unsignedInt"/>
+ 	<xsd:attribute name="value" type="xsd:double"/>
+ </xsd:complexType>
+ 
+ <xsd:complexType name="GroundMotionModelsType">
+    <xsd:sequence>
+      <xsd:element name="GroundMotionModel" type="GroundMotionModelType" minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>  
+ </xsd:complexType>
+ 
+  <xsd:complexType name="TimeWindowType">
+ 	<xsd:attribute name="endTime" type="unittype" use="required"/>
+ </xsd:complexType>
+ 
+  <xsd:complexType name="TimeWindowsType">
+    <xsd:sequence>
+      <xsd:element name="TimeWindow" type="TimeWindowType" minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>  
+ </xsd:complexType>
+ 
+ <xsd:complexType name="GroundMotionModelType">
+    <xsd:sequence>
+      <xsd:element name="Coefficient" type="GroundMotionModelCoefficientType" minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>  
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="type" type="xsd:string" use="required"/>
+   <xsd:attribute name="defaultStandardDeviation" type="xsd:double"/>
+   <xsd:attribute name="numberOfStandardDeviations" type="xsd:unsignedInt"/>
+ </xsd:complexType>
+ 
+ <xsd:complexType name="RiskSiteType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="location" type="tensortype" use="required"/>
+   <xsd:attribute name="weight" type="xsd:double" use="optional"/>
+   <xsd:attribute name="groundMotionModelName" type="xsd:string" use="required"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="RiskSitesType">
+    <xsd:sequence>
+      <xsd:element name="Site" type="RiskSiteType" minOccurs="1" maxOccurs="unbounded"/>
+      <xsd:element name="GroundMotionModels" type="GroundMotionModelsType" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="TimeWindows" type="TimeWindowsType" minOccurs="0" maxOccurs="1"/>
+   </xsd:sequence>  
+   <xsd:attribute name="logmin" type="xsd:double" use="required"/>
+   <xsd:attribute name="logmax" type="xsd:double" use="required"/>
+   <xsd:attribute name="logsize" type="xsd:double" use="required"/>
+   <xsd:attribute name="nuisanceAnchorAcceleration" type="unittype" use="optional"/>
+   <xsd:attribute name="nuisanceStandardDeviation" type="arraytype" use="optional"/>   
+ </xsd:complexType>
+
+ <xsd:complexType name="FaultVariableType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="epistemicMin" type="unittype" use="required"/>
+   <xsd:attribute name="epistemicMax" type="unittype" use="required"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="FaultVariablesType">
+    <xsd:sequence>
+      <xsd:element name="FaultVariable" type="FaultVariableType" minOccurs="1" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="numberOfEpistemicIterations" type="xsd:unsignedInt" use="required"/>
+   <xsd:attribute name="numberOfAleatoricIterations" type="xsd:unsignedInt" use="required"/>
+ </xsd:complexType>
+
+
+
+ 
+
+
+
+
+ 
+ 
+ 
+ <!-- DEFINITIONS FOR SOLVERS -->
+ <xsd:complexType name="LagrangeExplicitDynamicsSolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="courant" type="xsd:double"/>
+   <xsd:attribute name="dampingM" type="xsd:double"/>
+   <xsd:attribute name="gapdamping" type="xsd:double"/>
+   <!--tied nodes-->
+   <xsd:attribute name="tiedNodesFlag" type="xsd:integer"/>
+   <xsd:attribute name="tiedNodeNormalRuptureStress" type="unittype"/>
+   <xsd:attribute name="tiedNodeShearRuptureStress" type="unittype"/>
+   <xsd:attribute name="tiedNodeTolerance" type="unittype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="LagrangeDynamicsParallelPlateFlowExplicitType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="courant" type="xsd:double"/>
+   <xsd:attribute name="ppcourant" type="xsd:double"/>
+   <xsd:attribute name="dampingM" type="xsd:double"/>
+   <xsd:attribute name="gapdamping" type="xsd:double"/>
+   <!--Barton joint will move to interface model soon -->
+   <xsd:attribute name="BartonJointParameters" type="tensortype"/>
+   <xsd:attribute name="normalJointStiffness" type="unittype"/>
+   <xsd:attribute name="shearJointStiffness" type="unittype"/>
+   <xsd:attribute name="COFJoint" type="xsd:double"/>
+   <xsd:attribute name="lockedInSIFFactor" type="xsd:double"/>
+   <!--tied nodes-->
+   <xsd:attribute name="tiedNodesFlag" type="xsd:integer"/>
+   <xsd:attribute name="tiedNodeNormalRuptureStress" type="unittype"/>
+   <xsd:attribute name="tiedNodeShearRuptureStress" type="unittype"/>
+   <xsd:attribute name="tiedNodeTolerance" type="unittype"/>
+   <!-- parallel plate -->
+   <xsd:attribute name="mu" type="xsd:double"/>
+   <xsd:attribute name="shapefactor" type="xsd:double"/>
+   <xsd:attribute name="MinimumAperture" type="unittype"/>
+   <xsd:attribute name="MaximumAperture" type="unittype"/>
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="rho_o" type="unittype"/>
+   <xsd:attribute name="flowFaceSet" type="xsd:string"/>
+   <xsd:attribute name="faceset" type="xsd:string"/>
+   <xsd:attribute name="pressurecap" type="xsd:double"/>
+   <xsd:attribute name="updateFaceArea" type="xsd:int"/>
+ </xsd:complexType>
+ 
+  <xsd:complexType name="HydrofractureType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="timeIntegration" type="xsd:string" use="required"/>
+   <xsd:attribute name="ppSolverName" type="xsd:string" use="required"/>
+   <xsd:attribute name="lgSolverName" type="xsd:string" use="required"/>
+   <xsd:attribute name="mfSolverName" type="xsd:string"/>
+   <xsd:attribute name="normalJointStiffness" type="unittype"/>
+   <xsd:attribute name="shearJointStiffness" type="unittype"/>
+   <xsd:attribute name="COFJoint" type="xsd:double"/>
+   <xsd:attribute name="lockedInSIFFactor" type="xsd:double"/>
+   <xsd:attribute name="dtMatrixFlow" type="xsd:double"/>
+ </xsd:complexType>
+ 
+ <xsd:complexType name="HydroStaticParallelPlateFlowSolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="pressurecap" type="unittype"/>
+   <xsd:attribute name="cavityVolume" type="unittype"/>
+   <xsd:attribute name="initialMass" type="unittype"/>
+   <xsd:attribute name="boreholeSetNames" type="xsd:string"/>
+   <xsd:attribute name="BartonJointParameters" type="tensortype"/>
+   <xsd:attribute name="rho_o" type="unittype"/>
+   <xsd:attribute name="CartersLeakoffCoefficient" type="xsd:double"/>
+   <xsd:attribute name="farFieldPorePressure" type="unittype"/>
+   <xsd:attribute name="updateFaceArea" type="xsd:int"/>
+   <xsd:attribute name="pressureDependentLeakoff" type="xsd:int"/>
+   <xsd:attribute name="overLeakCompensation" type="xsd:int"/>
+ </xsd:complexType>
+ 
+
+ <xsd:complexType name="LagrangeSolverType">
+   <xsd:attribute name="name"                           type="xsd:string" use="required"/>
+   <xsd:attribute name="courant"                        type="xsd:double"/>
+   <xsd:attribute name="dampingM"                       type="xsd:double"/>
+   <xsd:attribute name="dampingK"                       type="xsd:double"/>
+   <xsd:attribute name="tol"                            type="xsd:double"/>
+   <xsd:attribute name="useMLPreconditioner"            type="xsd:integer"/>
+   <xsd:attribute name="useDirectSolver"                type="xsd:integer"/>
+   <xsd:attribute name="useNewtonSolve"                 type="xsd:integer"/>
+   <xsd:attribute name="tiedNodesFlag"                  type="xsd:integer"/>
+   <xsd:attribute name="tiedNodeNormalRuptureStress"    type="unittype"/>
+   <xsd:attribute name="tiedNodeShearRuptureStress"     type="unittype"/>
+   <xsd:attribute name="tiedNodeTolerance"              type="xsd:double"/>
+   <xsd:attribute name="QS"                             type="xsd:boolean"/>
+   <xsd:attribute name="ID"                             type="xsd:boolean"/>
+   <xsd:attribute name="ED"                             type="xsd:boolean"/>
+   <xsd:attribute name="timeIntegrationOption"          type="xsd:integer"/>
+   <xsd:attribute name="bulkQ1"                         type="xsd:double"/>
+   <xsd:attribute name="bulkQ2"                         type="xsd:double"/>
+   <xsd:attribute name="twoD_option"                    type="xsd:integer"/>
+   <xsd:attribute name="referenceTemperature"           type="xsd:double"/>
+   <xsd:attribute name="thermalRegionNames"             type="xsd:string"/>
+   <xsd:attribute name="timeToSnapshotDisp"             type="xsd:double"/>
+  <xsd:attribute  name="tolNewton" 			type="xsd:double"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="ParallelPlateFlowSolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="ppcourant" type="xsd:double"/>
+   <xsd:attribute name="BartonJointParameters" type="tensortype"/>
+   <xsd:attribute name="mu" type="xsd:double"/>
+   <xsd:attribute name="shapefactor" type="xsd:double"/>
+   <xsd:attribute name="MinimumAperture" type="unittype"/>
+   <xsd:attribute name="MaximumAperture" type="unittype"/>
+   <xsd:attribute name="ZeroApertureVolumen" type="unittype"/>
+   <xsd:attribute name="BulkModulus" type="unittype"/>
+   <xsd:attribute name="rho_o" type="unittype"/>
+   <xsd:attribute name="flowFaceSet" type="xsd:string"/>
+   <xsd:attribute name="pressurecap" type="xsd:double"/>
+   <xsd:attribute name="CartersLeakoffCoefficient" type="xsd:double"/>
+   <xsd:attribute name="apertureMovingAverageCoeff" type="xsd:double"/>
+   <xsd:attribute name="farFieldPorePressure" type="unittype"/>
+   <xsd:attribute name="updateFaceArea" type="xsd:int"/>
+   <xsd:attribute name="pressureDependentLeakoff" type="xsd:int"/>
+   <xsd:attribute name="overLeakCompensation" type="xsd:int"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="MatrixFlowSolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="matrixRegionName" type="xsd:string" use="required"/>
+   <xsd:attribute name="timeIntegration" type="xsd:string"/>
+   <xsd:attribute name="tol" type="xsd:double"/>
+   <xsd:attribute name="maxSolverIntegration" type="xsd:int"/>
+   <xsd:attribute name="useMLPreconditioner" type="xsd:string"/>
+   <xsd:attribute name="nrTol" type="xsd:double"/>
+   <xsd:attribute name="nrMaxIterations" type="xsd:int"/>
+   <xsd:attribute name="fieldName" type="xsd:string"/>
+   <xsd:attribute name="fluidCompress" type="unittype"/>
+   <xsd:attribute name="fluidViscosity" type="unittype"/>
+   <xsd:attribute name="rhoRef" type="unittype"/>
+   <xsd:attribute name="pressRef" type="unittype"/>
+   <xsd:attribute name="rockCompress" type="unittype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="MicroseismicSourceSolverType">
+   <xsd:sequence>
+      <xsd:element name="JointSets" type="JointsType"/>
+   </xsd:sequence>
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="M0_Mtotal_ratio" type="xsd:double"/>
+   <xsd:attribute name="criticalStateLimit" type="unittype"/>
+   <xsd:attribute name="tocTableName" type="xsd:string"/>
+   <!-- cohesion statistics -->
+   <xsd:attribute name="meanCohesion" type="unittype"/>
+   <xsd:attribute name="stdevCohesion" type="unittype"/>
+   <xsd:attribute name="minCohesion" type="unittype"/>
+   <xsd:attribute name="maxCohesion" type="unittype"/>
+   <!-- friction statistics -->
+   <xsd:attribute name="meanFrictionCoefficient" type="xsd:double"/>
+   <xsd:attribute name="stdevFrictionCoefficient" type="xsd:double"/>
+   <xsd:attribute name="minFrictionCoefficient" type="xsd:double"/>
+   <xsd:attribute name="maxFrictionCoefficient" type="xsd:double"/>
+   <!-- A statistics -->
+   <xsd:attribute name="minA" type="xsd:double"/>
+   <xsd:attribute name="maxA" type="xsd:double"/>
+   <!-- AB ratio statistics -->
+   <xsd:attribute name="minABRatio" type="xsd:double"/>
+   <xsd:attribute name="maxABRatio" type="xsd:double"/>
+   <!-- Dc statistics -->
+   <xsd:attribute name="minDc" type="unittype"/>
+   <xsd:attribute name="maxDc" type="unittype"/>
+   <!-- vstar statistics -->
+   <xsd:attribute name="minVstar" type="unittype"/>
+   <xsd:attribute name="maxVstar" type="unittype"/>
+   <!-- theta statistics -->
+   <xsd:attribute name="minTheta" type="unittype"/>
+   <xsd:attribute name="maxTheta" type="unittype"/>
+   <!-- normal release statistics -->
+   <xsd:attribute name="minNormalRelease" type="unittype"/>
+   <xsd:attribute name="maxNormalRelease" type="unittype"/>
+ </xsd:complexType>
+ 
+ <xsd:complexType name="FaultRuptureBEMSolverType">
+   <xsd:sequence>
+      <xsd:element name="Material" type="LinearElasticDEMMaterialType" minOccurs="1" maxOccurs="1"/>
+   </xsd:sequence>  
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <!--frame of reference-->
+   <xsd:attribute name="magnitudeWriteMin" type="xsd:double"/>
+   <xsd:attribute name="maximumHorizontalStressDirection" type="tensortype"/>
+   <xsd:attribute name="writeEvents" type="xsd:integer"/>
+   <xsd:attribute name="writeSubEvents" type="xsd:integer"/>
+   <xsd:attribute name="upVector" type="tensortype"/>
+   <xsd:attribute name="rakeVector" type="tensortype"/>
+   <xsd:attribute name="dHdu" type="unittype"/>
+   <xsd:attribute name="dhdu" type="unittype"/> 
+   <!--tectonic parameters-->   
+   <xsd:attribute name="slipRateEQ" type="unittype"/>
+   <xsd:attribute name="creepFrictionRate" type="unittype"/>
+   <!-- pore pressure table reference -->
+   <xsd:attribute name="porePressureTableName" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="SeismicRiskSolverType">
+   <xsd:sequence>
+      <xsd:element name="RiskSites" type="RiskSitesType" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="FaultVariables" type="FaultVariablesType" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="Material" type="LinearElasticDEMMaterialType" minOccurs="1" maxOccurs="1"/>
+   </xsd:sequence>  
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <!--frame of reference-->
+   <xsd:attribute name="magnitudeWriteMin" type="xsd:double"/>
+   <xsd:attribute name="maximumHorizontalStressDirection" type="tensortype"/>
+   <xsd:attribute name="upVector" type="tensortype"/>
+   <xsd:attribute name="rakeVector" type="tensortype"/>
+   <xsd:attribute name="dHdu" type="unittype"/>
+   <xsd:attribute name="dhdu" type="unittype"/> 
+   <!--tectonic parameters-->   
+   <xsd:attribute name="slipRateEQ" type="unittype"/>
+   <xsd:attribute name="creepFrictionRate" type="unittype"/>
+   <!-- pore pressure table reference -->
+   <xsd:attribute name="porePressureTableName" type="xsd:string"/>
+   
+   <!-- Risk assessment variables -->
+   <xsd:attribute name="magnitudeBinSize" type="xsd:double"/>
+   <xsd:attribute name="minimumMagnitude" type="xsd:double"/>
+   <xsd:attribute name="maximumMagnitude" type="xsd:double"/>
+   <xsd:attribute name="burnInTime" type="unittype"/>
+   <xsd:attribute name="aleatoricRunTime" type="unittype"/>
+   <xsd:attribute name="longTermSeismicityTimePeriod" type="unittype" use="optional"/>
+   <xsd:attribute name="gutenbergRichterComparisonTolerance" type="xsd:double"/>
+   <xsd:attribute name="catalogFileName" type="xsd:string"/>
+</xsd:complexType>
+   
+ <xsd:complexType name="WriteFieldToFileType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="fieldname" type="xsd:string" use="required"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="fileprefix" type="xsd:string"/>
+   <xsd:attribute name="objecttype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="append" type="xsd:boolean"/>
+   <xsd:attribute name="dt" type="unittype"/>
+ </xsd:complexType>   
+   
+ <xsd:complexType name="SubstepType">
+   <xsd:choice minOccurs="0" maxOccurs="unbounded">
+     <xsd:element name="Substep" type="SubstepType" />
+     <xsd:element name="Apply" type="ApplyType" />
+   </xsd:choice>
+   <xsd:attribute name="dt" type="unittype" use="optional"/>
+ </xsd:complexType>   
+   
+
+ 
+ <xsd:complexType name="SW4SolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="courant" type="xsd:double"/>
+ </xsd:complexType>
+
+  <xsd:complexType name="GeneralSolverType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="tol" type="xsd:double"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="SolversType">
+  <xsd:all>
+   <xsd:element name="LagrangeExplicitDynamicsSolver" type="LagrangeExplicitDynamicsSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="LagrangeDynamicsParallelPlateFlowExplicit" type="LagrangeDynamicsParallelPlateFlowExplicitType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Hydrofracture" type="HydrofractureType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="HydroStaticParallelPlateFlowSolver" type="HydroStaticParallelPlateFlowSolverType" minOccurs="0" maxOccurs="1"/>
+       
+          <xsd:element name="MicroseismicSourceSolver" type="MicroseismicSourceSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="FaultRuptureBEMSolver" type="FaultRuptureBEMSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="SeismicRiskSolver" type="SeismicRiskSolverType" minOccurs="0" maxOccurs="1"/>
+
+   <xsd:element name="ImplicitMechanicsSolver3D" type="GeneralSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="LagrangeSmallStrainLinearElastic" type="LagrangeSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="LagrangeSmallStrainLinearElastic2D" type="LagrangeSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="LagrangeLargeStrain" type="LagrangeSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="ParallelPlateFlowSolver" type="ParallelPlateFlowSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="MatrixFlowSolver" type="MatrixFlowSolverType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="WriteFieldToFile" type="WriteFieldToFileType" minOccurs="0" />
+   <xsd:element name="Substep" type="SubstepType" minOccurs="0" />
+   <xsd:element name="Include" type="IncludeType" minOccurs="0"  /> 
+   <xsd:element name="If" type="IFType" minOccurs="0"   />
+   <xsd:element name="SW4Solver" type="SW4SolverType" minOccurs="0" maxOccurs="1"/>
+  </xsd:all>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- DEFINITION FOR PARAMETERS -->
+ <xsd:complexType name="ParameterType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="value" type="xsd:string" use="required"/>
+ </xsd:complexType>
+ <xsd:complexType name="ParametersType">
+   <xsd:choice minOccurs="0" maxOccurs="unbounded">
+     <xsd:element name="Parameter" type="ParameterType"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:choice>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- DEFINITION FOR HACK -->
+ <xsd:complexType name="HackType">
+   <xsd:attribute name="hackInitStress" type="unittype" use="required"/>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- DEFINITION FOR Fracture -->
+ <xsd:complexType name="FractureType">
+   <xsd:attribute name="fractureFlag" type="xsd:integer"/>
+   <xsd:attribute name="preFractureSetName" type="xsd:string"/>
+   <xsd:attribute name="failCriterion" type="xsd:integer"/>
+   <xsd:attribute name="verbose" type="xsd:int"/>
+   <xsd:attribute name="failstress" type="unittype"/>
+   <xsd:attribute name="rockToughness" type="unittype"/>
+   <xsd:attribute name="maxKinkAngle" type="unittype"/>
+   <xsd:attribute name="maxTurnAngle" type="unittype"/>
+   <xsd:attribute name="separableSet" type="xsd:string"/>
+   <xsd:attribute name="separableFaceSet" type="xsd:string"/>
+   <xsd:attribute name="separableNodeSet" type="xsd:string"/>
+   <xsd:attribute name="failgap" type="unittype"/>
+   <xsd:attribute name="x1_PreFrac" type="arraytype"/>
+   <xsd:attribute name="y1_PreFrac" type="arraytype"/>
+   <xsd:attribute name="z1_PreFrac" type="arraytype"/>
+   <xsd:attribute name="x2_PreFrac" type="arraytype"/>
+   <xsd:attribute name="y2_PreFrac" type="arraytype"/>
+   <xsd:attribute name="z2_PreFrac" type="arraytype"/>
+   <xsd:attribute name="allowVacuumFrac" type="xsd:integer"/>
+   <xsd:attribute name="insitu_Stress" type="tensortype"/>
+   <xsd:attribute name="insituStress3D" type="arraytype"/>
+   <xsd:attribute name="type" type="xsd:string"/>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- DEFINITION FOR EDEM -->
+ <xsd:complexType name="EllipsoidalDEMType">
+   <xsd:sequence>
+    <xsd:element name="BoundaryMaterial" type="MaterialType" minOccurs="0"/>
+    <xsd:element name="Material" type="MaterialType" minOccurs="1"/>
+    <xsd:element name="Contact" type="ContactType" minOccurs="1"/>
+   </xsd:sequence>
+   <!-- cylindrical boundary -->
+   <xsd:attribute name="radius_cylinder" type="unittype"/>
+   <xsd:attribute name="height_cylinder" type="unittype"/>
+   <xsd:attribute name="strain_rate_cylinder" type="unittype"/>
+   <xsd:attribute name="stress_rate_cylinder" type="unittype"/>
+   <xsd:attribute name="stop_rate_at_time" type="unittype"/>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- UNITS -->
+ <xsd:simpleType name="defaultunitstype">
+  <xsd:restriction base="xsd:string">
+   <xsd:pattern value="(SI|Meters_Geodyn|Geodyn|cgs|BDiv|Microscale)_Units"/>
+  </xsd:restriction>
+ </xsd:simpleType>
+ 
+ <xsd:complexType name="UnitsType">
+   <xsd:attribute name="default_units" type="defaultunitstype"/>
+   <xsd:attribute name="length" type="xsd:string"/>
+   <xsd:attribute name="mass" type="xsd:string"/>
+   <xsd:attribute name="time" type="xsd:string"/>
+   <xsd:attribute name="temperature" type="xsd:string"/>
+   <xsd:attribute name="mole" type="xsd:string"/>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- MESH -->
+ <xsd:complexType name="MeshType">
+   <xsd:attribute name="file" type="xsd:string"/>
+   <xsd:attribute name="messagesize" type="xsd:integer"/>
+   <xsd:attribute name="ellipsoid_file" type="xsd:string"/>
+   <xsd:attribute name="de_file" type="xsd:string"/>
+   <xsd:attribute name="faultpatch_file" type="xsd:string"/>
+   <xsd:attribute name="units" type="xsd:string"/>
+   <xsd:attribute name="externalMeshFile" type="xsd:integer"/>
+   <xsd:attribute name="nx" type="xsd:string"/>
+   <xsd:attribute name="ny" type="xsd:string"/>
+   <xsd:attribute name="nz" type="xsd:string"/>
+   <xsd:attribute name="xcoords" type="xsd:string"/>
+   <xsd:attribute name="ycoords" type="xsd:string"/>
+   <xsd:attribute name="zcoords" type="xsd:string"/>
+   <xsd:attribute name="elementType" type="xsd:string"/>
+   <xsd:attribute name="elementTypes" type="xsd:string"/>
+   <xsd:attribute name="regionNames" type="xsd:string"/>
+   <xsd:attribute name="perturbationFactor" type="xsd:double"/>
+   <xsd:attribute name="perturbationSeed" type="xsd:integer"/>
+   <xsd:attribute name="mapToRadial" type="xsd:integer"/>
+ </xsd:complexType>
+
+
+
+ <!--INITIAL CONDITIONS-->
+ <xsd:complexType name="ConstantInitialConditionType">
+   <xsd:attribute name="toregions" type="xsd:string"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="value" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="InitialConditionFunctionType">
+   <xsd:attribute name="toregions" type="xsd:string"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="variables" type="xsd:string"/>
+   <xsd:attribute name="variableTypes" type="xsd:string"/>
+ </xsd:complexType>
+ 
+  <xsd:complexType name="InitialConditionTableType">
+   <xsd:attribute name="toregions" type="xsd:string"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="table" type="xsd:string"/>
+  </xsd:complexType>
+
+ <xsd:complexType name="DirectiveType">
+ </xsd:complexType>
+
+ <xsd:complexType name="InitialConditionsType">
+  <xsd:choice minOccurs="0" maxOccurs="unbounded">
+   <xsd:element name="CalculateFaceNormals" type="DirectiveType" />
+   <xsd:element name="CalculateFaceCenters" type="DirectiveType" />
+   <xsd:element name="ConstantInitialCondition" type="ConstantInitialConditionType" />
+   <xsd:element name="InitialConditionFunction" type="InitialConditionFunctionType" />
+   <xsd:element name="InitialConditionTable" type="InitialConditionTableType"/>
+   <xsd:element name="Include" type="IncludeType" />
+  </xsd:choice>
+ </xsd:complexType>
+ 
+ <!--BOUNDARY CONDITIONS-->
+ <xsd:complexType name="BoundaryConditionType">
+   <xsd:attribute name="component" type="xsd:integer"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="direction" type="tensortype"/>
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="toregion" type="xsd:string"/>
+ </xsd:complexType> 
+
+ <xsd:complexType name="BoundaryConditionFunctionType">
+   <xsd:attribute name="component" type="xsd:integer"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="variables" type="xsd:string"/>
+   <xsd:attribute name="variableTypes" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="direction" type="tensortype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="toregion" type="xsd:string"/>
+ </xsd:complexType> 
+ 
+ <xsd:complexType name="MultiVarDirichletBoundaryConditionType">
+   <xsd:attribute name="component" type="xsd:integer"/>
+   <xsd:attribute name="fieldname" type="xsd:string"/>
+   <xsd:attribute name="fieldtype" type="xsd:string"/>
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="direction" type="tensortype"/>
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="toregion" type="xsd:string"/>
+   <xsd:attribute name="varName" type="xsd:string"/>
+   <xsd:attribute name="isClamped" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="TractionBoundaryConditionType">
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="direction" type="tensortype"/>
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="applyNormalTraction" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="TractionBoundaryConditionFunctionType">
+   <xsd:attribute name="setnames" type="xsd:string"/>
+   <xsd:attribute name="object" type="xsd:string"/>
+   <xsd:attribute name="direction" type="tensortype"/>
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="variables" type="xsd:string"/>
+   <xsd:attribute name="variableTypes" type="xsd:string"/>
+   <xsd:attribute name="applyNormalTraction" type="xsd:string"/>
+ </xsd:complexType>
+
+  <xsd:complexType name="RadialHydraulicPressureBoundaryConditionType">
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="applyNormalTraction" type="xsd:string"/>
+   <xsd:attribute name="axialLength" type="unittype"/>
+   <xsd:attribute name="origin" type="tensortype"/>
+   <xsd:attribute name="axis" type="tensortype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="CavityPressureBoundaryConditionType">
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="axialLength" type="unittype"/>
+   <xsd:attribute name="origin" type="tensortype"/>
+   <xsd:attribute name="axis" type="tensortype"/>
+   <xsd:attribute name="radius" type="unittype"/>
+   <xsd:attribute name="bulkModulus" type="unittype"/>
+   <xsd:attribute name="referenceDensity" type="unittype"/>
+   <xsd:attribute name="pressureCap" type="unittype"/>
+   <xsd:attribute name="effectiveBoreholeLength" type="unittype"/>
+   <xsd:attribute name="volume" type="unittype"/>
+   <xsd:attribute name="initialMass" type="unittype"/>
+   <xsd:attribute name="setnamesHydro" type="xsd:string"/>   
+ </xsd:complexType>
+
+ <xsd:complexType name="PerforatedCasedWellboreBoundaryConditionType">
+   <xsd:attribute name="scale" type="unittype"/>
+   <xsd:attribute name="function" type="xsd:string"/>
+   <xsd:attribute name="timetable" type="xsd:string"/>
+   <xsd:attribute name="applyNormalTraction" type="xsd:string"/>
+   <xsd:attribute name="axialLength" type="unittype"/>
+   <xsd:attribute name="origin" type="tensortype"/>
+   <xsd:attribute name="axis" type="tensortype"/>
+   <xsd:attribute name="radius" type="unittype"/>
+   <xsd:attribute name="bulkModulus" type="unittype"/>
+   <xsd:attribute name="referenceDensity" type="unittype"/>
+   <xsd:attribute name="pressureCap" type="unittype"/>
+   <xsd:attribute name="pipeFriction" type="xsd:double"/>
+   <xsd:attribute name="perforationChannelFriction" type="xsd:double"/>
+   <xsd:attribute name="casingThickness" type="unittype"/>
+   <xsd:attribute name="perforationK" type="xsd:double"/>
+   <xsd:attribute name="perforationDiameter" type="unittype"/>
+   <xsd:attribute name="perforationSnap" type="unittype"/>
+   <xsd:attribute name="perforationCountPerCluster" type="xsd:integer"/>
+   <xsd:attribute name="effectiveBoreholeLength" type="unittype"/>
+   <xsd:attribute name="volume" type="unittype"/>
+   <xsd:attribute name="initialMass" type="unittype"/>
+   <xsd:attribute name="setnamesHydro" type="xsd:string"/>   
+ </xsd:complexType>
+
+ <xsd:complexType name="BoundaryConditionsType">
+  <xsd:choice minOccurs="0" maxOccurs="unbounded">
+    <xsd:element name="TractionBoundaryCondition" type="TractionBoundaryConditionType" />
+    <xsd:element name="TractionBoundaryConditionFunction" type="TractionBoundaryConditionFunctionType" />
+    <xsd:element name="BoundaryCondition" type="BoundaryConditionType" />
+    <xsd:element name="BoundaryConditionFunction" type="BoundaryConditionFunctionType" />
+    <xsd:element name="MultiVarDirichletBoundaryCondition" type="MultiVarDirichletBoundaryConditionType" />
+    <xsd:element name="RadialHydraulicPressureBoundaryCondition" type="RadialHydraulicPressureBoundaryConditionType" />
+    <xsd:element name="CavityPressureBoundaryCondition" type="CavityPressureBoundaryConditionType" />
+    <xsd:element name="PerforatedCasedWellboreBoundaryCondition" type="PerforatedCasedWellboreBoundaryConditionType"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:choice>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!--INITIAL PROPERTIES-->
+ <xsd:complexType name="ConstitutiveType">
+   <xsd:attribute name="object" type="xsd:string" use="required"/>
+   <xsd:attribute name="propertytype" type="xsd:string" use="required"/>
+   <xsd:attribute name="tablename" type="xsd:string"/>
+   <xsd:attribute name="value" type="unittype"/>
+   <xsd:attribute name="toregion" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="InitialConstitutiveValuesType">
+  <xsd:sequence>
+   <xsd:element name="InitialConstitutiveValue" type="ConstitutiveType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+ <xsd:complexType name="EnforcedConstitutiveValuesType">
+  <xsd:sequence>
+   <xsd:element name="EnforcedConstitutiveValue" type="ConstitutiveType" minOccurs="0" maxOccurs="unbounded"/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!--TABLES-->
+ <xsd:complexType name="Table1DType">
+   <xsd:attribute name="name" type="xsd:string"/>
+   <xsd:attribute name="coord" type="xsd:string"/>
+   <xsd:attribute name="value" type="xsd:string"/>
+   <xsd:attribute name="interpolation" type="xsd:string"/>
+ </xsd:complexType>
+ 
+ <xsd:complexType name="Table2DType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="x_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="y_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="value_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="x_units" type="xsd:double"/>
+   <xsd:attribute name="y_units" type="xsd:double"/>
+   <xsd:attribute name="value_units" type="xsd:double"/>
+   <xsd:attribute name="interpolation" type="xsd:string"/>
+ </xsd:complexType> 
+
+ <xsd:complexType name="Table3DType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="x_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="y_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="z_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="voxel_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="x_units" type="xsd:double"/>
+   <xsd:attribute name="y_units" type="xsd:double"/>
+   <xsd:attribute name="z_units" type="xsd:double"/>
+   <xsd:attribute name="value_units" type="xsd:double"/>
+   <xsd:attribute name="interpolation" type="xsd:string"/>
+ </xsd:complexType> 
+
+ <xsd:complexType name="Table4DType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="t_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="x_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="y_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="z_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="time_voxel_file" type="xsd:string" use="required"/>
+   <xsd:attribute name="t_units" type="xsd:double"/>
+   <xsd:attribute name="x_units" type="xsd:double"/>
+   <xsd:attribute name="y_units" type="xsd:double"/>
+   <xsd:attribute name="z_units" type="xsd:double"/>
+   <xsd:attribute name="value_units" type="xsd:double"/>
+   <xsd:attribute name="interpolation" type="xsd:string"/>
+ </xsd:complexType> 
+ 
+ <xsd:complexType name="TableNUFTType">
+   <xsd:attribute name="name" type="xsd:string" use="required"/>
+   <xsd:attribute name="file" type="xsd:string" use="required"/>
+   <xsd:attribute name="length_units" type="xsd:double"/>
+   <xsd:attribute name="t_units" type="xsd:double"/>
+   <xsd:attribute name="value_units" type="xsd:double"/>
+ </xsd:complexType> 
+ 
+ <xsd:complexType name="TablesType">
+  <xsd:choice minOccurs="0" maxOccurs="unbounded">
+   <xsd:element name="Table1D"   type="Table1DType" />
+   <xsd:element name="Table2D"   type="Table2DType" />
+   <xsd:element name="Table3D"   type="Table3DType" />
+   <xsd:element name="Table4D"   type="Table4DType" />
+   <xsd:element name="VectorField1D"   type="Table1DType" />
+   <xsd:element name="VectorField2D"   type="Table2DType" />
+   <xsd:element name="VectorField3D"   type="Table3DType" />
+   <xsd:element name="VectorField4D"   type="Table4DType" />
+   <xsd:element name="TableNUFT" type="TableNUFTType" />
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:choice>
+ </xsd:complexType> 
+ 
+ 
+  <!--FUNCTIONS-->
+ <xsd:complexType name="SymbolicFunctionType">
+   <xsd:attribute name="f" type="xsd:string"/>
+   <xsd:attribute name="name" type="xsd:string"/>
+   <xsd:attribute name="variables" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="ConstantFunctionType">
+   <xsd:attribute name="f" type="xsd:string"/>
+   <xsd:attribute name="name" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="PolynomialFunctionType">
+   <xsd:attribute name="coeffs" type="xsd:string"/>
+   <xsd:attribute name="name" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="UniformRandomDistributionFunctionType">
+   <xsd:attribute name="max" type="xsd:string"/>
+   <xsd:attribute name="min" type="xsd:string"/>
+   <xsd:attribute name="uniqueAcrossProcessors" type="xsd:string"/>
+   <xsd:attribute name="name" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="TableFunctionType">
+   <xsd:attribute name="table" type="xsd:string"/>
+   <xsd:attribute name="name" type="xsd:string"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="FunctionsType">
+   <xsd:choice minOccurs="0" maxOccurs="unbounded">
+     <xsd:element name="SymbolicFunction"   type="SymbolicFunctionType"/>
+     <xsd:element name="ConstantFunction"   type="ConstantFunctionType"/>
+     <xsd:element name="PolynomialFunction"   type="PolynomialFunctionType"/>
+     <xsd:element name="UniformRandomDistribution"   
+                  type="UniformRandomDistributionFunctionType"/>
+     <xsd:element name="Lookup4DTable"   type="TableFunctionType"/> <!-- Tables are automatically registered as functions of the same name -->
+     <xsd:element name="Lookup3DTable"   type="TableFunctionType"/>
+     <xsd:element name="Lookup2DTable"   type="TableFunctionType"/>
+     <xsd:element name="Lookup1DTable"   type="TableFunctionType"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+   </xsd:choice>
+ </xsd:complexType> 
+
+
+
+
+ 
+ <!--ELEMENT REGION-->
+ <xsd:complexType name="ElementRegionType">
+   <xsd:choice>
+     <xsd:element name="LinearElasticOrthotropic" type="LinearElasticOrthotropicType"/>
+     <xsd:element name="LinearElasticMaterial" type="LinearElasticMaterialType"/>
+     <xsd:element name="DamageSphericalPoresMaterial" type="DamageSphericalPoresMaterialType"/>
+     <xsd:element name="LinearElasticDEMMaterial" type="LinearElasticDEMMaterialType"/>
+     <xsd:element name="DSIDDamageMaterial" type="DSIDDamageMaterialType"/>
+   </xsd:choice>
+   <xsd:attribute name="name" type="xsd:string"/>
+   <xsd:attribute name="abaqusID" type="xsd:string"/>
+   <xsd:attribute name="elementtype" type="xsd:string"/>
+   <xsd:attribute name="hgDamp" type="xsd:double"/>
+   <xsd:attribute name="hgStiff" type="xsd:double"/>
+   <xsd:attribute name="materialName" type="xsd:string"/>
+ </xsd:complexType>   
+
+ <xsd:complexType name="ElementRegionsType">
+  <xsd:sequence>
+   <xsd:element name="ElementRegion" type="ElementRegionType" minOccurs="0" maxOccurs="unbounded"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!--PARTITION-->
+ <xsd:complexType name="SpatialPartitionType">
+   <xsd:attribute name="xpar" type="xsd:integer"/>
+   <xsd:attribute name="ypar" type="xsd:integer"/>
+   <xsd:attribute name="zpar" type="xsd:integer"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="PartitionType">
+  <xsd:choice>
+   <xsd:element name="SpatialPartition" type="SpatialPartitionType" minOccurs="0" maxOccurs="1"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:choice>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!--OUTPUT-->
+ <xsd:complexType name="OutputType">
+   <xsd:attribute name="writePlot" type="xsd:int"/>
+   <xsd:attribute name="writeRestart" type="xsd:int"/>
+   <xsd:attribute name="restart_interval" type="unittype"/>
+   <xsd:attribute name="plot_interval" type="unittype"/>
+   <xsd:attribute name="plotIntervalTable" type="xsd:string"/>
+   <xsd:attribute name="plotfile_root" type="xsd:string"/>
+   <xsd:attribute name="slave_directory" type="xsd:string"/>
+   <xsd:attribute name="parallel_silo" type="xsd:integer"/>
+   <xsd:attribute name="writeFEMEdges" type="xsd:integer"/>
+   <xsd:attribute name="writeFEMFaces" type="xsd:integer"/>
+   <xsd:attribute name="fieldsToPlot" type="xsd:string"/>
+   <xsd:attribute name="maxWallTime" type="xsd:integer"/>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- JOINTS -->
+ <xsd:complexType name="JointSetType">
+   <!-- weight -->
+   <xsd:attribute name="weight" type="xsd:double"/>
+   <!-- random seed -->
+   <xsd:attribute name="seed" type="xsd:unsignedInt"/>
+   <xsd:attribute name="upVector" type="tensortype"/>
+   <xsd:attribute name="northVector" type="tensortype"/>
+   <!--strike length-->
+   <xsd:attribute name="exponentStrikeDimension" type="unittype"/>
+   <xsd:attribute name="minStrikeDimension" type="unittype"/>
+   <xsd:attribute name="maxStrikeDimension" type="unittype"/>
+   <!--dip length-->
+   <xsd:attribute name="meanAspectRatio" type="xsd:double"/>
+   <xsd:attribute name="stdevAspectRatio" type="xsd:double"/>
+   <xsd:attribute name="minAspectRatio" type="xsd:double"/>
+   <xsd:attribute name="maxAspectRatio" type="xsd:double"/>
+   <!--strike angle-->
+   <xsd:attribute name="meanStrikeAngle" type="unittype"/>
+   <xsd:attribute name="stdevStrikeAngle" type="unittype"/>
+   <xsd:attribute name="minStrikeAngle" type="unittype"/>
+   <xsd:attribute name="maxStrikeAngle" type="unittype"/>
+   <!--dip angle-->
+   <xsd:attribute name="meanDipAngle" type="unittype"/>
+   <xsd:attribute name="stdevDipAngle" type="unittype"/>
+   <xsd:attribute name="minDipAngle" type="unittype"/>
+   <xsd:attribute name="maxDipAngle" type="unittype"/>
+   <!--hypocenter-->
+   <xsd:attribute name="hurstExponent" type="xsd:double"/>
+   <xsd:attribute name="meanFrequency" type="xsd:double"/>
+   <xsd:attribute name="maxFrequency" type="xsd:double"/>
+   <xsd:attribute name="stdevFrequency" type="xsd:double"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="JointsType">
+   <xsd:sequence>
+    <xsd:element name="JointSet" type="JointSetType" minOccurs="0" maxOccurs="unbounded"/>
+   </xsd:sequence>
+   <xsd:attribute name="upVector" type="tensortype"/>
+   <xsd:attribute name="northVector" type="tensortype"/>
+   <xsd:attribute name="elementRegionName" type="xsd:string"/>
+   <xsd:attribute name="nodeSetName" type="xsd:string"/>
+   <xsd:attribute name="file" type="xsd:string"/>
+ </xsd:complexType>
+
+
+ <!-- Geometric objects -->
+ <xsd:complexType name="GeometryListType">
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="Cylinder" type="CylinderGOType" />
+      <xsd:element name="CylinderBy2Ends" type="CylinderGOType" />
+      <xsd:element name="Sphere" type="SphereGOType" />
+      <xsd:element name="Box" type="BoxGOType" />
+      <xsd:element name="Ellipsoid" type="EllipsoidGOType" />
+      <xsd:element name="Intersection" type="GeometryListType" />
+      <xsd:element name="Union" type="GeometryListType" />
+      <xsd:element name="Invert" type="GeometryListType" />
+      <xsd:element name="And" type="GeometryListType" />
+      <xsd:element name="Or" type="GeometryListType" />
+      <xsd:element name="Not" type="GeometryListType"/>
+      <xsd:element name="Transform" type="TransformGOType"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+    </xsd:choice>
+ </xsd:complexType>
+
+ <xsd:complexType name="CylinderGOType">
+   <xsd:attribute name="point1" type="tensortype"  use="required"/>
+   <xsd:attribute name="point2" type="tensortype"  use="required"/>
+   <xsd:attribute name="radius" type="unittype"  use="required"/>
+ </xsd:complexType>
+
+
+ <xsd:complexType name="TransformGOType">
+    <xsd:complexContent> 
+      <xsd:extension base="GeometryListType">  
+        <xsd:attribute name="U" type="xsd:string"  use="required"/>
+        <xsd:attribute name="r" type="tensortype"  use="required"/>
+      </xsd:extension> 
+    </xsd:complexContent> 
+ </xsd:complexType>
+
+
+ <xsd:complexType name="SphereGOType">
+   <xsd:attribute name="center" type="tensortype"  use="required"/>
+   <xsd:attribute name="radius" type="unittype"  use="required"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="EllipsoidGOType">
+   <xsd:attribute name="center" type="tensortype"  use="required"/>
+   <xsd:attribute name="rx" type="unittype"  use="required"/>
+   <xsd:attribute name="ry" type="unittype"  use="required"/>
+   <xsd:attribute name="rz" type="unittype"  use="required"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="BoxGOType">
+   <xsd:attribute name="xmin" type="tensortype" use="required"/>
+   <xsd:attribute name="xmax" type="tensortype" use="required"/>
+ </xsd:complexType>
+
+
+
+ 
+ <!-- NODESETS -->
+ <xsd:complexType name="NodesetType">
+   <xsd:sequence>
+     <xsd:element name="Geometry" type="GeometryListType" minOccurs="0" maxOccurs="1"/>
+   </xsd:sequence>
+   <xsd:attribute name="name" type="xsd:string"/>
+   <xsd:attribute name="type" type="xsd:int"/>
+   <xsd:attribute name="xmin" type="tensortype"/>
+   <xsd:attribute name="xmax" type="tensortype"/>
+   <xsd:attribute name="point1" type="tensortype"/>
+   <xsd:attribute name="point2" type="tensortype"/>
+   <xsd:attribute name="radius" type="unittype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="NodesetsType">
+   <xsd:choice minOccurs="0" maxOccurs="unbounded">
+    <xsd:element name="Nodeset" type="NodesetType" />
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+   </xsd:choice>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!--SOLVER APPLICATION-->
+ <xsd:complexType name="ApplyType">
+   <xsd:attribute name="solver" type="xsd:string"/>
+   <xsd:attribute name="toregions" type="srangetype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="ApplicationType">
+  <xsd:choice minOccurs="0" maxOccurs="unbounded">
+   <xsd:element name="Apply" type="ApplyType" />
+   <xsd:element name="Substep" type="SubstepType"/>
+  </xsd:choice>
+  <xsd:attribute name="name" type="xsd:string"/>
+  <xsd:attribute name="begintime" type="unittype"/>
+  <xsd:attribute name="endtime" type="unittype"/>
+  <xsd:attribute name="dt" type="unittype"/>
+ </xsd:complexType>
+
+ <xsd:complexType name="SolverApplicationType">
+  <xsd:sequence>
+   <xsd:element name="Application" type="ApplicationType" minOccurs="0" maxOccurs="unbounded"/>
+    <!-- <xsd:element name="Include" type="IncludeType" /> -->
+     <xsd:group ref="IfIncludeOption"/>
+  </xsd:sequence>
+ </xsd:complexType>
+
+
+
+
+ 
+ <!-- PARENT -->
+ <xsd:element name="Problem" type="ProblemType"/>
+ 
+ <xsd:complexType name="ProblemType">
+  <xsd:all>
+   <xsd:element name="Units" type="UnitsType" minOccurs="0" maxOccurs="1"/>
+   <!-- <xsd:element name="Materials" type="MaterialsType" minOccurs="0" maxOccurs="1"/> -->
+   <xsd:element name="Fracture" type="FractureType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="HACK" type="HackType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Mesh" type="MeshType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="JointSets" type="JointsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Nodesets" type="NodesetsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Solvers" type="SolversType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="SolverApplications" type="SolverApplicationType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="ElementRegions" type="ElementRegionsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Contact" type="ContactType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="EllipsoidalDEM" type="EllipsoidalDEMType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="InitialConditions" type="InitialConditionsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="BoundaryConditions" type="BoundaryConditionsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="InitialConstitutiveValues" type="InitialConstitutiveValuesType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="EnforcedConstitutiveValues" type="EnforcedConstitutiveValuesType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Tables" type="TablesType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Functions" type="FunctionsType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Partition" type="PartitionType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Output" type="OutputType" minOccurs="0" maxOccurs="1"/>
+   <xsd:element name="Parameters" type="ParametersType" minOccurs="0" />
+   <xsd:element name="If" type="IFType" minOccurs="0" />
+   <xsd:element name="Include" type="IncludeType" minOccurs="0" />
+  </xsd:all>
+  <!-- <xsd:element name="Include" type="IncludeType" /> -->
+<!-- 
+   <xsd:choice>
+  <xsd:choice minOccurs="0" maxOccurs="unbounded">
+   <xsd:element name="Parameters" type="ParametersType" />
+   <xsd:group ref="IfIncludeOption"/>
+  </xsd:choice>
+   </xsd:choice>-->
+
+ </xsd:complexType>
+</xsd:schema>

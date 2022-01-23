@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+
+  <!-- srun -ppdebug -n2 GPAC.x -i testADRMPI.xml -ypar2 -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units length="mm" mass="g" time="s" temperature="K" mole="mol" >
+  </Units>
+
+<!--  <Parameter meshFile="Aperture.inp"/>-->
+<Parameter meshFile="ApertureSmall.inp"/>
+
+
+  <Solvers>
+      <SteadyStateParallelPlateFlowSolver_TwoD name="pvSolver"
+                                          tol="1e-8" 
+                                          faceset="Zmax" verbose="0" 
+                                          MaximumAperture="0.2 mm"/>
+
+      <ParallelPlateADRSolver name="adrSolver" tol="1e-12" faceset="Zmax" species="CO2" Diffusivity="1e-10 m^2/s" doDataWrite="0"/>
+
+      <ParallelPlateADRSolver name="adrSolverB" tol="1e-12" faceset="Zmax" species="Ca" Diffusivity="1e-10 m^2/s" doDataWrite="0"/>
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.01s" dt="0.001s">
+
+         <Apply solver="pvSolver" toregions="fracture1" />  
+           <Apply solver="adrSolver" toregions="fracture1" />
+           <Apply solver="adrSolverB" toregions="fracture1" />
+    </Application>  
+  </SolverApplications>
+
+  <Tables>
+<!--    <Table2D name="ApertureTable" value_file="Aperture_values.txt" x_file="Aperture_x_ticks.txt" y_file="Aperture_y_ticks.txt" 
+x_units="cm" y_units="cm" value_units="mm"/-->
+  </Tables>
+
+  <ElementRegions>
+  </ElementRegions>
+
+  <Mesh file="$:meshFile" units="cm" />
+
+  <BoundaryConditions>
+<!-- -->
+    <BoundaryCondition     object="Edge"
+                           fieldname="Pressure" 
+                           setnames="YminZmax"
+                           scale="2.05 MPa" />
+    <BoundaryCondition     object="Edge"
+                           fieldname="Pressure" 
+                           setnames="YmaxZmax"
+                           scale="2.0 MPa" />
+
+
+<!-- -->
+    <BoundaryCondition     object="Edge"
+                           fieldname="CO2" 
+                           setnames="YminZmax"
+                           scale="1.0 mol" />
+    <BoundaryCondition     object="Edge"
+                           fieldname="Ca" 
+                           setnames="YminZmax"
+                           scale="1.0 mol" />
+    <!--<EdgeBoundaryCondition fieldname="CO2" 
+                           setnames="YmaxZmax"
+                           scale="0.0" />-->
+  </BoundaryConditions>
+
+  <InitialConditions>
+
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Face" value="1.0" />
+
+    <ConstantInitialCondition fieldname="CO2" fieldtype="Scalar" object="Face" value="0" />
+    <ConstantInitialCondition fieldname="Ca" fieldtype="Scalar" object="Face" value="0" />
+
+
+<!-- Aperture -->
+    <CalculateFaceCenters/>
+
+    <InitialConditionFunction fieldname="Aperture" fieldtype="Scalar" object="Face" setnames="Zmax" function="ApertureFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector" />
+<!-- Shape surface and mesh elements -->
+     <InitialConditionFunction fieldname="Zshift" fieldtype="Scalar" object="Node" 
+                              function="ApertureFunc"
+                              variables="ReferencePosition"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="ReferencePosition" fieldtype="Vector" component="2" object="Node" 
+                              function="surfaceFunction"
+                              variables="ReferencePosition Zshift"
+                              variableTypes="Vector Scalar" /> 
+  </InitialConditions>
+
+  <Functions>
+
+    <ConstantFunction name="ApertureFunc" f="0.01"/>
+
+    <SymbolicFunction name="surfaceFunction"
+                      constants="zMax 0.2cm"
+                      f="z*(1-dz/zMax)"
+                      variables ="x,y,z,dz" />
+
+    <!--Lookup2DTable name="ApertureFunc" table="ApertureTable" /-->
+
+  </Functions>
+
+  <Output plot_interval="0.001s" plotfile_root="sspp2DB" writeFEMEdges="1" writeFEMFaces="1"/>
+</Problem>

@@ -1,0 +1,7 @@
+
+
+DEBUG=1
+COMPILER=gcc
+HAVE_MPI=1
+PROFILE=0
+#EXTERNAL_LIBS=/g/path/to/home/external_libs

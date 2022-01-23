@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<!-- A test for the hydrostatic parallel plate flow solver.
+    This solver is derived from the parallel plate flow slover and is expected to be used in the new hydrofracture solver.
+    This solver is appropriate when resolving the pressure gradient is not important, such as for high toughness cases where aperture is wide and pressure gradient is small.
+    In such a scenario, the regular pp solver will require a very small time step.
+    The hydrostaic solver does not have a critical time step so in theory we can use high bulk modulus.  But I thought high bulk modulus can still make the system stiff and sensitive.
+    The flow field is not resolved.  Intead, the EOS is solved for all the flow cells combined.
+    Even if there are multiple independent fractures, they will have identical pressure.
+    It makes the most sense to use flow rate bc.  If pressure bc is specified, all flow cells will use this this pressure; if multiple pressure bc's are used, the last one will prevail. 
+    This particular example is a KGD-like bc in the toughness dominated regime with low resolution. The analytical solution can be found in the NAG paper by Fu, Johnson, and Carrigan.
+    -->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+    <Hydrofracture name="hf2" 
+		   timeIntegration="Explicit"
+		   ppSolverName="ppsolve"
+		   lgSolverName="lagsolve"/>
+
+    <LagrangeLargeStrain name="lagsolve" 
+			 courant="0.6" 
+			 timeIntegrationOption="2"
+			 dampingM="1000"/>
+
+    <HydroStaticParallelPlateFlowSolver name="ppsolve"
+			     BulkModulus="1.0e8" 
+			     pressurecap="10e6" />
+
+  </Solvers>
+
+
+
+  <Mesh 
+    xcoords="0 100 200"
+    ycoords="-200 -60 60 200"
+    nx="20 5"
+    ny="5 20 5"
+    elementType="CPE4"
+    regionNames="Region"
+    />
+
+  <Nodesets>
+    <Nodeset name="source" 
+	     type="0" 
+	     xmin="-0.1 -0.1 0"
+	     xmax=" 5.1  0.1 0" />
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="100.0">
+      <Apply solver="hf2" toregions="Region"/>
+    </Application> 
+
+  </SolverApplications>
+
+  <ElementRegions>
+   <ElementRegion name="Region" elementtype="poly">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="50000" BulkModulus="11.111e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+     <BoundaryCondition     object="Face"
+                            fieldname="combinedFlowRate" 
+                            setnames="source" 
+                            scale="0.002"
+                            timetable="ttable" />
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="xneg" component="0" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="xpos" component="0" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="yneg" component="1" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="ypos" component="1" scale="0.0" fieldtype="Vector"/>
+
+
+  </BoundaryConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0, 0.01,  1.0e9"
+               value = "1.0, 1.0, 1.0" />
+  </Tables>
+
+   
+  <Partition>
+    <SpatialPartition xpar="3" ypar="5" zpar="1" />
+  </Partition>
+
+  <Fracture fractureFlag="10"
+	    preFractureSetName=""
+      separableSet="all"
+      insitu_Stress="0 0 0.0"
+	    failstress="-2e5"
+	    failgap="0.0004"
+	    verbose="0" 
+	    x1_PreFrac="0"
+      y1_PreFrac="0"
+      z1_PreFrac="0"
+      x2_PreFrac="10"
+      y2_PreFrac="0"
+      z2_PreFrac="0"
+      rockToughness="10e6"
+     	maxKinkAngle = "134.0"
+      maxTurnAngle = "30"
+      />
+
+  <Output  writePlot="0" writeFEMFaces="1" plot_interval="10" restart_interval="50.0" plotfile_root="hshf" parallel_silo="1"/>
+</Problem>

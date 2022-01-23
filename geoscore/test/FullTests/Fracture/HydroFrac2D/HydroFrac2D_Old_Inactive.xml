@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+
+    <LagrangeDynamicsParallelPlateFlowExplicit name="solver1" 
+        courant="0.6" 
+        ppcourant = "0.4"
+        BulkModulus="1.0e7" 
+        dampingM="1000"
+        BartonJointParameters="1.5e-5 5e6 0.1e-5"
+        MaximumAperture="5.0e-2"
+        pressurecap="3e6" 
+        updateFaceArea="0"/>
+  </Solvers>
+
+
+
+  <Mesh 
+    xcoords="0 16 32"
+    ycoords="-20 -4 4 20"
+    nx="16 4"
+    ny="4 8 4"
+    elementType="STRI"
+    regionNames="RegionA RegionB RegionC RegionD RegionE RegionF"
+    perturbationFactor = "0.01"
+    perturbationSeed = "0"
+    />
+
+  <Nodesets>
+    <Nodeset name="source" 
+	     type="0" 
+	     xmin="-0.1 -0.1 0"
+	     xmax="1.1 0.1 0" />
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="6.0">
+      <Apply solver="solver1" toregions="RegionA RegionB RegionC RegionD RegionE RegionF"/>
+    </Application> 
+
+  </SolverApplications>
+
+  <ElementRegions>
+   <ElementRegion name="RegionA" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+   <ElementRegion name="RegionB" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+   <ElementRegion name="RegionC" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+   <ElementRegion name="RegionD" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+   <ElementRegion name="RegionE" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+   <ElementRegion name="RegionF" elementtype="linear">
+       <LinearElasticMaterial ShearModulus="8.3333e9" Density="2650" BulkModulus="11.111e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+     <BoundaryCondition     object="Face"
+                            fieldname="combinedFlowRate" 
+                            setnames="source" 
+                            scale="0.002"
+                            timetable="ttable" />
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="xneg" component="0" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="xpos" component="0" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="yneg" component="1" scale="0.0" fieldtype="Vector"/>
+     <BoundaryCondition object="Node" fieldname="Velocity" setnames="ypos" component="1" scale="0.0" fieldtype="Vector"/>
+
+
+  </BoundaryConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0, 0.01,  1.0e9"
+               value = "1.0, 1.0, 1.0" />
+  </Tables>
+
+   
+  <Partition>
+    <SpatialPartition xpar="2" ypar="2" zpar="1" />
+  </Partition>
+
+  <Fracture fractureFlag="10"
+	    preFractureSetName=""
+      separableSet="all"
+      insitu_Stress="0 0 0.0"
+	    failstress="2e5"
+	    failgap="0.0004"
+	    verbose="0" 
+	    x1_PreFrac="0, 10"
+      y1_PreFrac="0, -4"
+      z1_PreFrac="0, 0"
+      x2_PreFrac="6, 10"
+      y2_PreFrac="0, 4"
+      z2_PreFrac="0, 0"
+      rockToughness="0.5e6"
+     	maxKinkAngle = "134.0"
+      maxTurnAngle = "100"
+      />
+
+  <Output  writePlot="0" writeFEMFaces="1" restart_interval="3.0" plotfile_root="hf2d" parallel_silo="1"/>
+</Problem>

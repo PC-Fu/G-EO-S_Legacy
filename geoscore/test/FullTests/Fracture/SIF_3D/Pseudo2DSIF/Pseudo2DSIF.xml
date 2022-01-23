@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+<!-- Mixed mode SIF calculation of a fracture 60 degrees from the traction direction.
+The analytical solution if KI = sqrt(pi * 1.0) * 3/4 = 1.33 and KII = sqrt(pi) * sqrt(3)/4 = 0.767
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    twoD_option="1"
+                                    tol="1e-15"
+                        			useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <Mesh
+		externalMeshFile = "0"
+		xcoords = "-10 -1.732 1.732 10"
+		ycoords = "-10 -1 1 10"
+		zcoords = "-0.5 0.5"
+		nx = "11 16 11"
+		ny = "11 16 11"
+		nz = "1"
+		elementType = "C3D4"
+		regionNames = "Region"
+	/>
+
+
+  <Nodesets>
+
+    <Nodeset name="corner1" 
+	     type="0" 
+	     xmin="-10.01 -10.01 -0.6"
+	     xmax="-9.99  -9.99  -0.4" />
+    <Nodeset name="corner2" 
+	     type="0" 
+	     xmin="9.99 -10.01 -0.6"
+	     xmax="10.01 -9.99 -0.4" />
+    <Nodeset name="corner3" 
+	     type="0" 
+	     xmin="-10.01 9.99 -0.6"
+	     xmax="-9.99 10.01 -0.4" />    
+	<Nodeset name="crack" 
+	     type="1" 
+	     point1=" 0 0 0"
+	     point2="-0.01 0.0173205 0"
+	     radius = "1.2" />
+
+
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="4e6"  Density="1000" BulkModulus="6.66667e6" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="yneg" 
+	                     direction="0.0 -1 0.0" 
+			                 scale="1.0" />
+  <TractionBoundaryCondition object="Node" setnames="ypos" 
+	                     direction="0.0 1 0.0" 
+			                 scale="1.0" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="corner2" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="corner1 corner2" component="1" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="corner1 corner2 corner3" component="2" scale="0.0" fieldtype="Vector" />
+
+</BoundaryConditions>
+
+
+  <Fracture fractureFlag="1"
+	  preFractureSetName="crack"
+      separableSet="all"
+      rockToughness="0.5e100"
+      failCriterion="1"
+	  failgap="0.0004"
+
+  />
+
+
+
+<Partition>
+  <SpatialPartition xpar="2" ypar="2" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" restart_interval="1.0" plot_interval="1.0" plotfile_root="3D" parallel_silo="1" writeFEMFaces="1" writeFEMEdges="1"/>
+
+</Problem>
+
+
+

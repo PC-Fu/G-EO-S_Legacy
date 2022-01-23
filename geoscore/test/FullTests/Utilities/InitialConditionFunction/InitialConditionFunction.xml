@@ -1,0 +1,105 @@
+<?xml version="1.0" ?>
+
+  <!-- Paint variable from a table onto faces as an intial condition. -->
+
+<Problem>
+
+
+  <Units length="m" mass="g" time="s" temperature="K" mole="mol" />
+
+
+  <Solvers>
+    <WriteFieldToFile name="ghostWFTF"
+                 fieldname="ghostRank"
+                 fieldtype="Integer"
+                 fileprefix="temp"
+                 objecttype="Face"
+                 setnames = "xneg yneg xpos ypos"
+                 append="1" 
+                 dt="3"/>
+
+  </Solvers>
+<!-- dt="$:dT" -->
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2" dt="2">
+      <Apply solver="ghostWFTF" toregions="Region"/>
+    </Application>
+
+  </SolverApplications>
+
+    <Mesh 
+     xcoords="-1 1"
+     ycoords="-1 1"
+     zcoords="-1 6"
+     nx="5"
+     ny="5"
+     nz="14"
+     regionNames="Region"
+     elementType="C3D8"
+     />
+
+  <!--xxxxxxxxxxxxxxxxxxxx-->
+  <!-- Initial Conditions -->
+  <!--xxxxxxxxxxxxxxxxxxxx-->
+  <InitialConditions>
+
+
+    <!-- Face normals/centers -->
+    <CalculateFaceNormals/>
+    <CalculateFaceCenters/>
+
+    <!-- theta z -->
+
+    <InitialConditionFunction fieldname="theta" fieldtype="Scalar" object="Face" setnames="xneg yneg xpos ypos"
+                              function="thetaFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector"  /> 
+
+    <InitialConditionFunction fieldname="z" fieldtype="Scalar" object="Face" setnames="xneg yneg xpos ypos"
+                              function="zFunc" 
+                              variables="FaceCenter"
+                              variableTypes="Vector"  /> 
+  
+
+    <InitialConditionFunction fieldname="NormalDisplacement" fieldtype="Scalar" object="Face" setnames="xneg yneg xpos ypos"
+                              function="aTwoDTable"
+                              variables="z theta"
+                              variableTypes="Scalar Scalar" /> 
+
+
+  </InitialConditions>
+
+
+  <!-- TABLES -->
+  <Tables>
+    <!-- Every table defines a function of the same name -->
+    <Table2D name="aTwoDTable" 
+             value_file="TableData/Table_values.txt" 
+             x_file="TableData/Table_xs.txt"
+             y_file="TableData/Table_thetas.txt"  
+             interpolation = "0"  />
+  </Tables>
+
+  <!-- FUNCTIONS -->
+  <Functions>
+
+    <SymbolicFunction name="thetaFunc"
+                      f="atan2(y,x)*180/3.14159+180"
+                      variables ="x,y,z" /> 
+
+    <SymbolicFunction name="zFunc"
+                      f="z"
+                      variables ="x,y,z" /> 
+
+  </Functions>
+
+
+  <Output plot_interval="2" 
+          restart_interval="100"  
+          plotfile_root="Pipe" 
+          writeFEMEdges="1" 
+          writeFEMFaces="1"
+          writePlot="0"
+          writeRestart="1"/>
+
+</Problem>

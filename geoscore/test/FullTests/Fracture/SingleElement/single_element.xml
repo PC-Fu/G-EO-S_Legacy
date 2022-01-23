@@ -1,0 +1,44 @@
+  <Mesh 
+        externalMeshFile="0"
+	xcoords="-0.5 0.5"
+	ycoords="-1 1"
+	zcoords="-0.5 0.5"
+	nx="1"
+	ny="2"
+	nz="1"
+	regionNames="Region"
+	elementType="C3D8"
+	/>
+
+  <Nodesets>
+    <Nodeset name="center" 
+	     type="0" 
+	     xmin="-10 -.1 -10"
+	     xmax="10 .1 10" />
+  </Nodesets>
+
+
+  <ElementRegions>
+    <ElementRegion abaqusID="C3D8" name="Region" elementtype="poly">
+        <LinearElasticMaterial ShearModulus="15.0e9" Density="2650" BulkModulus="15.0e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <InitialConditions>
+  </InitialConditions>
+
+
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+
+
+  <Fracture fractureFlag="1" 
+	    verbose="1" 
+	    type="InitiallyRigidCohesiveZone"
+	    failstress="1.0e5"
+	    failgap="0.1"
+	    separableSet="center"
+	    />
+

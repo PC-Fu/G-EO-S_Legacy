@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+
+<!-- Patch test: small deformation contact enforced using penalty method -->
+<!-- 		 Crack face oriented along X                             -->
+<!--             Exact solution expected: u_y = y; u_x = 0;              -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+  <Mesh 
+    externalMeshFile="0"
+    xcoords="-8 8"    
+    ycoords="-2 2"
+	nx="48"
+	ny="6"
+	elementType="STRI"
+	regionNames="Region"
+	/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+
+  <Nodesets>
+   <!--Include file="/g/g90/csrini/GEOS_git/gpaca/test/FullTests/Contact/PenaltySmallDef/BeamBending/Triangles/Nodesets.xml"/--> <!-- For running from ~/Temp/ /-->
+   <Include file="Nodesets.xml"/>
+  </Nodesets>
+
+  <Solvers>
+    <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-16"
+				    useMLPreconditioner="0"
+				    useDirectSolver="1"/>
+  </Solvers>
+
+  <Contact active="1"
+           ImplicitActive="1"
+	   ThreeDTrue="0"
+           PenaltyNormal="2.4e+04"
+	   PenaltyTau1="2.4e+04"
+	   NitscheFlag="1">
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+
+  <Fracture fractureFlag="1" 
+	    preFractureSetName="" 
+            failgap="0.0004"
+	    x1_PreFrac="0"
+            y1_PreFrac="-2"
+            z1_PreFrac="0"
+            x2_PreFrac="0"
+            y2_PreFrac="2"
+            z2_PreFrac="0"/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1" dt="1">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="linear" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="500" Density="1" BulkModulus="333.333333333333333"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <!--Include file="/g/g90/csrini/GEOS_git/gpaca/test/FullTests/Contact/PenaltySmallDef/BeamBending/Triangles/BoundaryConditions.xml"/--> <!-- For running from ~/Temp/ /-->
+    <Include file="BoundaryConditions.xml"/>
+
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="tv1"
+               coord = "0.0,  1.0"
+               value = "1.0,  1.0" />
+
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="1" plot_interval="1" restart_interval="1" plotfile_root="tangent" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

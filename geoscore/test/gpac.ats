@@ -1,0 +1,108 @@
+import os, sys, platform
+
+#define path references
+defTrunk = '%s/..' % (os.getcwd())
+trunkDir = os.environ.get('GPAC_TRUNK', defTrunk)
+codeDir = os.path.abspath('%s' % (trunkDir))
+binDir = os.path.abspath('/usr/gapps/GEOS/external_libs_icc_opt/bin')
+#binDir = os.path.abspath('%s/external_libs/bin' % (trunkDir))
+scriptDir = os.path.abspath('%s/scripts' % (trunkDir))
+
+#define default executables
+######defaultXmlValidator = '%s/xml' % (binDir)
+######defaultXmlArgs = "val --xsd"
+defaultXmlValidator = '%s/xmllint' % (binDir)
+defaultXmlArgs = "--noout --schema"
+defaultGpac = '%s/GPAC.x' % (codeDir)
+defaultMPI = '/usr/bin/srun'
+defaultMPIArgs = ' -ppdebug '
+defaultSilodiff = '%s/silodiffdriver.sh' % (scriptDir)
+defaultXsdpath = '%s/src/schema/gpac.xsd' % (codeDir)
+
+#define executables
+gpac = os.environ.get('GPAC_EXEC', defaultGpac)
+xmlvalidator = os.environ.get('XMLVALIDATOR_EXEC', defaultXmlValidator)
+xmlargs = os.environ.get('XMLVALIDATOR_ARGS', defaultXmlArgs)
+mpiexec = os.environ.get('MPI_EXEC', defaultMPI)
+mpiargs = os.environ.get('MPI_ARGS', defaultMPIArgs)
+silodiff = os.environ.get('GPACRESTARTCOMPARISON_EXEC', defaultSilodiff)
+xsd = os.environ.get('XSD_PATH', defaultXsdpath)
+
+count = 0
+#restart_baseline = 'restart.%s' % (os.environ.get('OSTYPE', "baseline"))
+restart_baseline = 'restart.%s' % (platform.system())
+
+def runAndPost(inputFile,
+               label=None,
+	       np=1,
+	       clas2=None,
+	       restartBaseline=restart_baseline,
+	       restartNow="restart_000000",
+	       restartTolerance=None,
+	       restartTest=None,
+               **options):
+    if inputFile is None: 
+        inputFile = 'test.xml'
+    defaultLabelSplit = inputFile.split('.', 1)
+    defaultLabel = defaultLabelSplit[0]
+    if label is None: 
+        label = defaultLabel
+    if clas2 is None:
+        clas2 = ""
+
+# Remove the restart files before proceeding
+    try:
+        os.remove(restartNow)
+    except OSError:
+        pass
+    try:
+        if restartTest is not None:
+            os.remove(restartTest)
+    except OSError:
+        pass    
+
+# Test the validity of the input file
+    labeltt = "%s" % (label)
+    clastt = "%s %s %s" % (xmlargs, xsd, inputFile)
+    t1 = test(clas=clastt, executable=xmlvalidator, label=label, 
+             name="XML_VALID", **options)
+
+# Test the code
+    clas = " ".join(["-i %s" % (inputFile), clas2])
+
+    if np > 1:
+        clas = "-n %d%s%s %s" % (np, mpiargs, gpac, clas)
+	print "%s %s" % (mpiexec, clas)
+        t2 = testif(t1, clas=clas, executable=mpiexec, label=label, 
+             name="MPI", np=1, **options)
+    else:
+        t2 = testif(t1, clas=clas, executable=gpac, label=label, 
+             name="GPAC", np=np, **options)
+
+    if restartTolerance is None:
+        clastt = "%s %s" % (restartBaseline, restartNow)
+    else:
+        clastt = "%s %s %s" % (restartBaseline, restartNow, restartTolerance)
+
+#   print " ".join([here,clastt])
+    t3 = testif(t2, clas=clastt, executable=silodiff, label=labeltt,
+             name="SILODIFF", keep = 1)
+    if restartTest is None:
+        return t3   # may be useful
+
+# If previous tests worked and restartTest is defined then ...
+
+    clas = "%s -r %s" % (clas, restartTest)
+    if np > 1:
+        t4 = testif(t3, clas=clas, executable=mpiexec, label=label, 
+             name="MPI_RESTART", np=1, **options)
+    else:
+        t4 = testif(t3, clas=clas, executable=gpac, label=label, 
+             name="GPAC_RESTART", np=np, **options)
+
+    t5 = testif(t4, clas=clastt, executable=silodiff, label=labeltt,
+             name="SILODIFF_RESTART", keep = 1)
+
+    return t5   # may be useful
+
+define(gpac=runAndPost)

@@ -1,0 +1,43 @@
+partmode i
+
+
+parameter
+nelems 1
+;
+
+
+
+block
+1; 
+1; 
+1; 
+ 0.0 1.0;
+ 0.0 1.0;
+ 0.0 1.0;
+mate 1
+
+ NSETI ;;;= block1
+
+endpart
+
+
+block
+1; 
+1; 
+1; 
+ -1.0 0.0;
+  0.0 1.0;
+  0.0 1.0;
+mate 1
+
+NSETI ;;;= block2
+endpart
+
+
+merge
+NDIGITS 14
+mof testblock.geom
+abaqus
+write
+
+exit

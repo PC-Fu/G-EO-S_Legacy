@@ -1,0 +1,41 @@
+partmode i
+
+
+parameter
+nelems 1
+;
+
+
+
+block
+1;
+1;
+1;
+-1.0  1.0;
+-1.0  1.0;
+-1.0  1.0;
+
+mate 1;
+
+
+ NSETI -1;-1;-1;= node1
+ NSETI -2;-1;-1;= node2
+ NSETI -2;-2;-1;= node3
+ NSETI -1;-2;-1;= node4
+ NSETI -1;-1;-2;= node5
+ NSETI -2;-1;-2;= node6
+ NSETI -2;-2;-2;= node7
+ NSETI -1;-2;-2;= node8
+
+
+endpart
+
+
+merge
+NDIGITS 12
+mof single_element.geom
+abaqus
+write
+
+interrupt
+exit

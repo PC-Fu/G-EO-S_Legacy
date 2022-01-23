@@ -1,0 +1,89 @@
+<?xml version="1.0" ?>
+<!-- A strip load on a half space.  Use two different element types
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+
+<Parameters>
+  <Parameter name="SolidDensity"      value="2650 kg/m^3" />
+  <Parameter name="SolidBulkModulus"  value="8.33333 MPa" />
+  <Parameter name="SolidShearModulus" value="3.84615 MPa" />
+  <Parameter name="deltaTime"         value="0.005 s" />
+  <Parameter name="endTime"           value="0.01 s"/>
+</Parameters>
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-16"
+				    useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <Mesh 
+    xcoords="-100 -10 10 100"
+    ycoords="-100 -16 0"
+	nx="10 20 10"
+	ny="10 16"
+	elementTypes="CPE4    CPE4    CPE4    STRI    CPE4    CPE4 "
+	regionNames="RegionA RegionA RegionA RegionB RegionA RegionA"
+	/>
+
+
+  <Nodesets>
+    <Nodeset name="strip" 
+	     type="0" 
+	     xmin="-3.1 -0.1 0"
+	     xmax="3.1 0.1 0" />
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="RegionA RegionB"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="RegionA" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+    <ElementRegion name="RegionB" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="strip" 
+	                     direction="0.0 -1 0.0" 
+			     scale="1.0 MPa"
+			     timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+
+
+</BoundaryConditions>
+
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 10.0"
+           value = "0.0, 1.0" />
+</Tables>
+
+
+
+
+
+<Partition>
+  <SpatialPartition xpar="1" ypar="1" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" restart_interval="1.0" plotfile_root="plot" parallel_silo="1"/>
+
+</Problem>

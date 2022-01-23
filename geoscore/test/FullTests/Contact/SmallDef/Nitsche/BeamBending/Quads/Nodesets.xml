@@ -1,0 +1,492 @@
+    <Nodeset name = "xneg1"
+    type = "0"
+    xmin=" -8.0002 -2.0001 0"
+    xmax=" -7.9998 -1.9999 0"/>
+
+    <Nodeset name = "xneg2"
+    type = "0"
+    xmin=" -8.0002 -1.9168 0"
+    xmax=" -7.9998 -1.9166 0"/>
+
+    <Nodeset name = "xneg3"
+    type = "0"
+    xmin=" -8.0002 -1.8334 0"
+    xmax=" -7.9998 -1.8332 0"/>
+
+    <Nodeset name = "xneg4"
+    type = "0"
+    xmin=" -8.0002 -1.7501 0"
+    xmax=" -7.9998 -1.7499 0"/>
+
+    <Nodeset name = "xneg5"
+    type = "0"
+    xmin=" -8.0002 -1.6668 0"
+    xmax=" -7.9998 -1.6666 0"/>
+
+    <Nodeset name = "xneg6"
+    type = "0"
+    xmin=" -8.0002 -1.5834 0"
+    xmax=" -7.9998 -1.5832 0"/>
+
+    <Nodeset name = "xneg7"
+    type = "0"
+    xmin=" -8.0002 -1.5001 0"
+    xmax=" -7.9998 -1.4999 0"/>
+
+    <Nodeset name = "xneg8"
+    type = "0"
+    xmin=" -8.0002 -1.4168 0"
+    xmax=" -7.9998 -1.4166 0"/>
+
+    <Nodeset name = "xneg9"
+    type = "0"
+    xmin=" -8.0002 -1.3334 0"
+    xmax=" -7.9998 -1.3332 0"/>
+
+    <Nodeset name = "xneg10"
+    type = "0"
+    xmin=" -8.0002 -1.2501 0"
+    xmax=" -7.9998 -1.2499 0"/>
+
+    <Nodeset name = "xneg11"
+    type = "0"
+    xmin=" -8.0002 -1.1668 0"
+    xmax=" -7.9998 -1.1666 0"/>
+
+    <Nodeset name = "xneg12"
+    type = "0"
+    xmin=" -8.0002 -1.0834 0"
+    xmax=" -7.9998 -1.0832 0"/>
+
+    <Nodeset name = "xneg13"
+    type = "0"
+    xmin=" -8.0002 -1.0001 0"
+    xmax=" -7.9998 -0.9999 0"/>
+
+    <Nodeset name = "xneg14"
+    type = "0"
+    xmin=" -8.0002 -0.91677 0"
+    xmax=" -7.9998 -0.91657 0"/>
+
+    <Nodeset name = "xneg15"
+    type = "0"
+    xmin=" -8.0002 -0.83343 0"
+    xmax=" -7.9998 -0.83323 0"/>
+
+    <Nodeset name = "xneg16"
+    type = "0"
+    xmin=" -8.0002 -0.7501 0"
+    xmax=" -7.9998 -0.7499 0"/>
+
+    <Nodeset name = "xneg17"
+    type = "0"
+    xmin=" -8.0002 -0.66677 0"
+    xmax=" -7.9998 -0.66657 0"/>
+
+    <Nodeset name = "xneg18"
+    type = "0"
+    xmin=" -8.0002 -0.58343 0"
+    xmax=" -7.9998 -0.58323 0"/>
+
+    <Nodeset name = "xneg19"
+    type = "0"
+    xmin=" -8.0002 -0.5001 0"
+    xmax=" -7.9998 -0.4999 0"/>
+
+    <Nodeset name = "xneg20"
+    type = "0"
+    xmin=" -8.0002 -0.41677 0"
+    xmax=" -7.9998 -0.41657 0"/>
+
+    <Nodeset name = "xneg21"
+    type = "0"
+    xmin=" -8.0002 -0.33343 0"
+    xmax=" -7.9998 -0.33323 0"/>
+
+    <Nodeset name = "xneg22"
+    type = "0"
+    xmin=" -8.0002 -0.2501 0"
+    xmax=" -7.9998 -0.2499 0"/>
+
+    <Nodeset name = "xneg23"
+    type = "0"
+    xmin=" -8.0002 -0.16677 0"
+    xmax=" -7.9998 -0.16657 0"/>
+
+    <Nodeset name = "xneg24"
+    type = "0"
+    xmin=" -8.0002 -0.083433 0"
+    xmax=" -7.9998 -0.083233 0"/>
+
+    <Nodeset name = "xneg25"
+    type = "0"
+    xmin=" -8.0002 -0.0001 0"
+    xmax=" -7.9998 0.0001 0"/>
+
+    <Nodeset name = "xneg26"
+    type = "0"
+    xmin=" -8.0002 0.083233 0"
+    xmax=" -7.9998 0.083433 0"/>
+
+    <Nodeset name = "xneg27"
+    type = "0"
+    xmin=" -8.0002 0.16657 0"
+    xmax=" -7.9998 0.16677 0"/>
+
+    <Nodeset name = "xneg28"
+    type = "0"
+    xmin=" -8.0002 0.2499 0"
+    xmax=" -7.9998 0.2501 0"/>
+
+    <Nodeset name = "xneg29"
+    type = "0"
+    xmin=" -8.0002 0.33323 0"
+    xmax=" -7.9998 0.33343 0"/>
+
+    <Nodeset name = "xneg30"
+    type = "0"
+    xmin=" -8.0002 0.41657 0"
+    xmax=" -7.9998 0.41677 0"/>
+
+    <Nodeset name = "xneg31"
+    type = "0"
+    xmin=" -8.0002 0.4999 0"
+    xmax=" -7.9998 0.5001 0"/>
+
+    <Nodeset name = "xneg32"
+    type = "0"
+    xmin=" -8.0002 0.58323 0"
+    xmax=" -7.9998 0.58343 0"/>
+
+    <Nodeset name = "xneg33"
+    type = "0"
+    xmin=" -8.0002 0.66657 0"
+    xmax=" -7.9998 0.66677 0"/>
+
+    <Nodeset name = "xneg34"
+    type = "0"
+    xmin=" -8.0002 0.7499 0"
+    xmax=" -7.9998 0.7501 0"/>
+
+    <Nodeset name = "xneg35"
+    type = "0"
+    xmin=" -8.0002 0.83323 0"
+    xmax=" -7.9998 0.83343 0"/>
+
+    <Nodeset name = "xneg36"
+    type = "0"
+    xmin=" -8.0002 0.91657 0"
+    xmax=" -7.9998 0.91677 0"/>
+
+    <Nodeset name = "xneg37"
+    type = "0"
+    xmin=" -8.0002 0.9999 0"
+    xmax=" -7.9998 1.0001 0"/>
+
+    <Nodeset name = "xneg38"
+    type = "0"
+    xmin=" -8.0002 1.0832 0"
+    xmax=" -7.9998 1.0834 0"/>
+
+    <Nodeset name = "xneg39"
+    type = "0"
+    xmin=" -8.0002 1.1666 0"
+    xmax=" -7.9998 1.1668 0"/>
+
+    <Nodeset name = "xneg40"
+    type = "0"
+    xmin=" -8.0002 1.2499 0"
+    xmax=" -7.9998 1.2501 0"/>
+
+    <Nodeset name = "xneg41"
+    type = "0"
+    xmin=" -8.0002 1.3332 0"
+    xmax=" -7.9998 1.3334 0"/>
+
+    <Nodeset name = "xneg42"
+    type = "0"
+    xmin=" -8.0002 1.4166 0"
+    xmax=" -7.9998 1.4168 0"/>
+
+    <Nodeset name = "xneg43"
+    type = "0"
+    xmin=" -8.0002 1.4999 0"
+    xmax=" -7.9998 1.5001 0"/>
+
+    <Nodeset name = "xneg44"
+    type = "0"
+    xmin=" -8.0002 1.5832 0"
+    xmax=" -7.9998 1.5834 0"/>
+
+    <Nodeset name = "xneg45"
+    type = "0"
+    xmin=" -8.0002 1.6666 0"
+    xmax=" -7.9998 1.6668 0"/>
+
+    <Nodeset name = "xneg46"
+    type = "0"
+    xmin=" -8.0002 1.7499 0"
+    xmax=" -7.9998 1.7501 0"/>
+
+    <Nodeset name = "xneg47"
+    type = "0"
+    xmin=" -8.0002 1.8332 0"
+    xmax=" -7.9998 1.8334 0"/>
+
+    <Nodeset name = "xneg48"
+    type = "0"
+    xmin=" -8.0002 1.9166 0"
+    xmax=" -7.9998 1.9168 0"/>
+
+    <Nodeset name = "xneg49"
+    type = "0"
+    xmin=" -8.0002 1.9999 0"
+    xmax=" -7.9998 2.0001 0"/>
+
+
+    <Nodeset name = "xpos1"
+    type = "0"
+    xmin=" 7.9998 -2.0001 0"
+    xmax=" 8.0002 -1.9999 0"/>
+
+    <Nodeset name = "xpos2"
+    type = "0"
+    xmin=" 7.9998 -1.9168 0"
+    xmax=" 8.0002 -1.9166 0"/>
+
+    <Nodeset name = "xpos3"
+    type = "0"
+    xmin=" 7.9998 -1.8334 0"
+    xmax=" 8.0002 -1.8332 0"/>
+
+    <Nodeset name = "xpos4"
+    type = "0"
+    xmin=" 7.9998 -1.7501 0"
+    xmax=" 8.0002 -1.7499 0"/>
+
+    <Nodeset name = "xpos5"
+    type = "0"
+    xmin=" 7.9998 -1.6668 0"
+    xmax=" 8.0002 -1.6666 0"/>
+
+    <Nodeset name = "xpos6"
+    type = "0"
+    xmin=" 7.9998 -1.5834 0"
+    xmax=" 8.0002 -1.5832 0"/>
+
+    <Nodeset name = "xpos7"
+    type = "0"
+    xmin=" 7.9998 -1.5001 0"
+    xmax=" 8.0002 -1.4999 0"/>
+
+    <Nodeset name = "xpos8"
+    type = "0"
+    xmin=" 7.9998 -1.4168 0"
+    xmax=" 8.0002 -1.4166 0"/>
+
+    <Nodeset name = "xpos9"
+    type = "0"
+    xmin=" 7.9998 -1.3334 0"
+    xmax=" 8.0002 -1.3332 0"/>
+
+    <Nodeset name = "xpos10"
+    type = "0"
+    xmin=" 7.9998 -1.2501 0"
+    xmax=" 8.0002 -1.2499 0"/>
+
+    <Nodeset name = "xpos11"
+    type = "0"
+    xmin=" 7.9998 -1.1668 0"
+    xmax=" 8.0002 -1.1666 0"/>
+
+    <Nodeset name = "xpos12"
+    type = "0"
+    xmin=" 7.9998 -1.0834 0"
+    xmax=" 8.0002 -1.0832 0"/>
+
+    <Nodeset name = "xpos13"
+    type = "0"
+    xmin=" 7.9998 -1.0001 0"
+    xmax=" 8.0002 -0.9999 0"/>
+
+    <Nodeset name = "xpos14"
+    type = "0"
+    xmin=" 7.9998 -0.91677 0"
+    xmax=" 8.0002 -0.91657 0"/>
+
+    <Nodeset name = "xpos15"
+    type = "0"
+    xmin=" 7.9998 -0.83343 0"
+    xmax=" 8.0002 -0.83323 0"/>
+
+    <Nodeset name = "xpos16"
+    type = "0"
+    xmin=" 7.9998 -0.7501 0"
+    xmax=" 8.0002 -0.7499 0"/>
+
+    <Nodeset name = "xpos17"
+    type = "0"
+    xmin=" 7.9998 -0.66677 0"
+    xmax=" 8.0002 -0.66657 0"/>
+
+    <Nodeset name = "xpos18"
+    type = "0"
+    xmin=" 7.9998 -0.58343 0"
+    xmax=" 8.0002 -0.58323 0"/>
+
+    <Nodeset name = "xpos19"
+    type = "0"
+    xmin=" 7.9998 -0.5001 0"
+    xmax=" 8.0002 -0.4999 0"/>
+
+    <Nodeset name = "xpos20"
+    type = "0"
+    xmin=" 7.9998 -0.41677 0"
+    xmax=" 8.0002 -0.41657 0"/>
+
+    <Nodeset name = "xpos21"
+    type = "0"
+    xmin=" 7.9998 -0.33343 0"
+    xmax=" 8.0002 -0.33323 0"/>
+
+    <Nodeset name = "xpos22"
+    type = "0"
+    xmin=" 7.9998 -0.2501 0"
+    xmax=" 8.0002 -0.2499 0"/>
+
+    <Nodeset name = "xpos23"
+    type = "0"
+    xmin=" 7.9998 -0.16677 0"
+    xmax=" 8.0002 -0.16657 0"/>
+
+    <Nodeset name = "xpos24"
+    type = "0"
+    xmin=" 7.9998 -0.083433 0"
+    xmax=" 8.0002 -0.083233 0"/>
+
+    <Nodeset name = "xpos25"
+    type = "0"
+    xmin=" 7.9998 -0.0001 0"
+    xmax=" 8.0002 0.0001 0"/>
+
+    <Nodeset name = "xpos26"
+    type = "0"
+    xmin=" 7.9998 0.083233 0"
+    xmax=" 8.0002 0.083433 0"/>
+
+    <Nodeset name = "xpos27"
+    type = "0"
+    xmin=" 7.9998 0.16657 0"
+    xmax=" 8.0002 0.16677 0"/>
+
+    <Nodeset name = "xpos28"
+    type = "0"
+    xmin=" 7.9998 0.2499 0"
+    xmax=" 8.0002 0.2501 0"/>
+
+    <Nodeset name = "xpos29"
+    type = "0"
+    xmin=" 7.9998 0.33323 0"
+    xmax=" 8.0002 0.33343 0"/>
+
+    <Nodeset name = "xpos30"
+    type = "0"
+    xmin=" 7.9998 0.41657 0"
+    xmax=" 8.0002 0.41677 0"/>
+
+    <Nodeset name = "xpos31"
+    type = "0"
+    xmin=" 7.9998 0.4999 0"
+    xmax=" 8.0002 0.5001 0"/>
+
+    <Nodeset name = "xpos32"
+    type = "0"
+    xmin=" 7.9998 0.58323 0"
+    xmax=" 8.0002 0.58343 0"/>
+
+    <Nodeset name = "xpos33"
+    type = "0"
+    xmin=" 7.9998 0.66657 0"
+    xmax=" 8.0002 0.66677 0"/>
+
+    <Nodeset name = "xpos34"
+    type = "0"
+    xmin=" 7.9998 0.7499 0"
+    xmax=" 8.0002 0.7501 0"/>
+
+    <Nodeset name = "xpos35"
+    type = "0"
+    xmin=" 7.9998 0.83323 0"
+    xmax=" 8.0002 0.83343 0"/>
+
+    <Nodeset name = "xpos36"
+    type = "0"
+    xmin=" 7.9998 0.91657 0"
+    xmax=" 8.0002 0.91677 0"/>
+
+    <Nodeset name = "xpos37"
+    type = "0"
+    xmin=" 7.9998 0.9999 0"
+    xmax=" 8.0002 1.0001 0"/>
+
+    <Nodeset name = "xpos38"
+    type = "0"
+    xmin=" 7.9998 1.0832 0"
+    xmax=" 8.0002 1.0834 0"/>
+
+    <Nodeset name = "xpos39"
+    type = "0"
+    xmin=" 7.9998 1.1666 0"
+    xmax=" 8.0002 1.1668 0"/>
+
+    <Nodeset name = "xpos40"
+    type = "0"
+    xmin=" 7.9998 1.2499 0"
+    xmax=" 8.0002 1.2501 0"/>
+
+    <Nodeset name = "xpos41"
+    type = "0"
+    xmin=" 7.9998 1.3332 0"
+    xmax=" 8.0002 1.3334 0"/>
+
+    <Nodeset name = "xpos42"
+    type = "0"
+    xmin=" 7.9998 1.4166 0"
+    xmax=" 8.0002 1.4168 0"/>
+
+    <Nodeset name = "xpos43"
+    type = "0"
+    xmin=" 7.9998 1.4999 0"
+    xmax=" 8.0002 1.5001 0"/>
+
+    <Nodeset name = "xpos44"
+    type = "0"
+    xmin=" 7.9998 1.5832 0"
+    xmax=" 8.0002 1.5834 0"/>
+
+    <Nodeset name = "xpos45"
+    type = "0"
+    xmin=" 7.9998 1.6666 0"
+    xmax=" 8.0002 1.6668 0"/>
+
+    <Nodeset name = "xpos46"
+    type = "0"
+    xmin=" 7.9998 1.7499 0"
+    xmax=" 8.0002 1.7501 0"/>
+
+    <Nodeset name = "xpos47"
+    type = "0"
+    xmin=" 7.9998 1.8332 0"
+    xmax=" 8.0002 1.8334 0"/>
+
+    <Nodeset name = "xpos48"
+    type = "0"
+    xmin=" 7.9998 1.9166 0"
+    xmax=" 8.0002 1.9168 0"/>
+
+    <Nodeset name = "xpos49"
+    type = "0"
+    xmin=" 7.9998 1.9999 0"
+    xmax=" 8.0002 2.0001 0"/>
+
+

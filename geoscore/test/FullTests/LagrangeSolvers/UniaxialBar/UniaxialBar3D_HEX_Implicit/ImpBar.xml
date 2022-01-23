@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!-- This comment won't print This is a 1d problem that tests wave propagation in a bar. -->
+<!--# This is a 1d problem that tests the implicit lagrange solver. #-->
+<!--# Based on the explicit_lagrange/bar1d test, and modified by Pengcheng Fu in May 2012. #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+      <ImplicitMechanicsSolver3D name="implag" 
+                                 tol="1e-10" />
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.04" dt="0.001 s">
+      <Apply solver="implag" toregions="PM1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="PM1" elementtype="poly">
+        <LinearElasticMaterial ShearModulus="30 GPa" Density="2650" BulkModulus="30 GPa"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <TractionBoundaryCondition setnames="xpos" 
+	                       direction="-1.0 0.0 0.0" 
+			       scale="20 MPa"
+			       timetable="ttable" />
+    <BoundaryCondition  fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  fieldname="Displacement" setnames="zneg" component="2" scale="0.0" fieldtype="Vector" />
+
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0, 0.01, 0.02, 0.03, 1.0e9"
+               value = "0.0,    1.0,    1.0,    0.0,  0.0" />
+  </Tables>
+    
+  <Mesh file="testblock.geom" />
+
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  plot_interval="0.002" restart_interval="1" plotfile_root="output" parallel_silo="1"/>
+
+</Problem>

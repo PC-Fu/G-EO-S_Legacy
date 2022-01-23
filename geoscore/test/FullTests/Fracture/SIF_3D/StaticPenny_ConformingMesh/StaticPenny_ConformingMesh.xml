@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+
+<!-- 
+In this test we actually use the plot file instead of the restart file to save disk space
+The analytical solution for KI along the circular edge is 2xsqrt(r/pi) = 3.58e6 with r=10.0
+-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+
+
+<Parameters>
+  <Parameter name="SolidDensity"      value="2650 kg/m^3" />
+  <Parameter name="SolidBulkModulus"  value="8.33333 GPa" />
+  <Parameter name="SolidShearModulus" value="3.84615 GPa" />
+  <Parameter name="deltaTime"         value="0.005 s" />
+  <Parameter name="endTime"           value="0.01 s"/>
+</Parameters>
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-10"
+                        			useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <Mesh file="QuarterDisk_Hex.inp"/>
+
+  <Nodesets>
+    <Nodeset name="crack" 
+        type="1"	    point1="0 0.0 -0.1"	    point2="0 0.0  0.1"        radius="10.1" />
+    <Nodeset name="top" 
+        type="1"	    point1="0 0.0 19.9"	    point2="0 0.0 20.1"        radius="1000.1" />     
+    <Nodeset name="bot" 
+        type="1"	    point1="0 0.0 -20.1"	    point2="0 0.0 -19.9"        radius="1000.1" />       
+    <Nodeset name="xneg" 
+        type="0" 
+	    xmin="-0.1 -100.1 -100"
+	    xmax="0.1   100.1  100" />    
+    <Nodeset name="yneg" 
+        type="0" 
+	    xmin="-100.1 -0.1 -100"
+	    xmax=" 100.1  0.1  100" />    	     
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="bot" 
+	                     direction="0.0 0.0 -1.0" 
+			                 scale="1.0e6"
+			                timetable="ttable" />
+  <TractionBoundaryCondition object="Node" setnames="top" 
+	                     direction="0.0 0.0 1.0" 
+			                 scale="1.0e6"
+			                timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 1.0"
+           value = "0.0, 1.0" />
+</Tables>
+
+  <Fracture fractureFlag="1"
+	    preFractureSetName="crack"
+      separableSet="all"
+      rockToughness="0.5e100"
+      failCriterion="1"
+	    failgap="0.0004"
+
+  />
+
+
+<Partition>
+  <SpatialPartition xpar="2" ypar="2" zpar="2" />
+</Partition>
+    
+<Output  writePlot="0" writeRestart="1" restart_interval="1.0" plot_interval="1.0" plotfile_root="restart" parallel_silo="1" writeFEMFaces="1" writeFEMEdges="1"/>
+
+</Problem>
+

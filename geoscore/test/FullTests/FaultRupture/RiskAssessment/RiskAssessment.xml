@@ -1,0 +1,106 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units default_units="SI_Units"/>
+
+  <Mesh faultpatch_file="testfault.geom" units="m"/>
+
+  <Solvers>
+    <SeismicRiskSolver name="solver1"
+		       upVector="0 0 1" 
+		       rakeVector="0 1 0" 
+		       maximumHorizontalStressDirection="1 0 0"
+		       dHdu="0" dhdu="0"
+		       slipRateEQ="1" creepFrictionRate="0.001"
+		       porePressureTableName="pp"
+		       magnitudeBinSize="0.25" minimumMagnitude="2.0" maximumMagnitude="5.0"
+		       burnInTime="100 year"
+		       longTermSeismicityTimePeriod="1000 year"
+		       aleatoricRunTime="200 year"
+		       gutenbergRichterComparisonTolerance="0.01">
+
+      <!-- define sites where you want to assess risk and the ground motion model to use -->
+      <RiskSites logmin="-2" logmax="1" logsize="0.2"
+		 nuisanceAnchorAcceleration="0.1" 
+		 nuisanceStandardDeviation="0.8">
+
+	<Site name="obs0" location="6000 6000 0" weight="0.5" groundMotionModelName="model0"/>
+	<Site name="obs1" location="3250 9000 0" weight="0.5" groundMotionModelName="model0"/>
+
+	<GroundMotionModels>
+	  <GroundMotionModel name="model0" type="XJB_82">
+	    <Coefficient index="1" value="6.87699986"/>
+	    <Coefficient index="2" value="0.527000010"/>
+	    <Coefficient index="4" value="-0.777999997"/>
+	    <Coefficient index="5" value="5.57000017"/>
+	    <Coefficient index="19" value="11.1000004"/>
+	    <Coefficient index="21" value="2.00000000"/>
+	    <Coefficient index="22" value="0.519999981"/>
+	    <Coefficient index="28" value="0.00000000"/>
+	  </GroundMotionModel>
+	</GroundMotionModels>
+
+	<TimeWindows>
+	  <TimeWindow endTime="20 year"/>
+	  <TimeWindow endTime="50 year"/>
+	  <TimeWindow endTime="100 year"/>
+	  <TimeWindow endTime="120 year"/>
+	  <TimeWindow endTime="160 year"/>
+	</TimeWindows>
+      </RiskSites>
+
+      <!-- define the uncertainty parameters -->
+      <FaultVariables numberOfEpistemicIterations="4" numberOfAleatoricIterations="10">
+	<FaultVariable name="A" epistemicMin="0.008" epistemicMax="0.01"/>
+	<FaultVariable name="B" epistemicMin="0.014" epistemicMax="0.016"/>
+	<FaultVariable name="Dc" epistemicMin="7.5e-6" epistemicMax="2e-5"/>
+      </FaultVariables>
+
+      <!-- define the material properties of the reservoir -->
+      <Material ShearModulus="3e10" BulkModulus="5e10"/>
+
+    </SeismicRiskSolver>
+  </Solvers>
+  
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="3e10">
+      <Apply solver="solver1" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <BoundaryConditions>
+    <BoundaryCondition  fieldname="shearRateDrive" 
+                        scale="3.1709792e-09"
+                        object="FaultElement"/>
+  </BoundaryConditions>
+  
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="currentFrictionCoefficient" tablename="frictionCoefficient" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="frictionCoefficient" tablename="frictionCoefficient" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearRateStar" tablename="shearRateStar" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearSlipRateAB" tablename="shearSlipRateAB" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="state" tablename="state" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="stressReference" tablename="stressReference" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearStressReference" tablename="shearStressReference" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="stressRate" tablename="stressRate" toregion="EB1"/>
+  </InitialConstitutiveValues>
+  
+  <Tables>
+    <Table3D name="frictionCoefficient" x_file="x" y_file="y" z_file="z" voxel_file="frictionCoefficient"/>
+    <Table3D name="shearRateStar" x_file="x" y_file="y" z_file="z" voxel_file="shearRateStar"/>
+    <Table3D name="shearSlipRateAB" x_file="x" y_file="y" z_file="z" voxel_file="shearSlipRateAB"/>
+    <Table3D name="state" x_file="x" y_file="y" z_file="z" voxel_file="state"/>
+    <Table3D name="stressRate" x_file="x" y_file="y" z_file="z" voxel_file="stressRate"/>
+    <Table3D name="stressReference" x_file="x" y_file="y" z_file="z" voxel_file="stressReference"/>
+    <Table3D name="shearStressReference" x_file="x" y_file="y" z_file="z" voxel_file="shearStressReference"/>
+    <Table4D name="pp" t_file="tpp" x_file="xpp" y_file="ypp" z_file="zpp" time_voxel_file="pp"/>
+  </Tables>
+
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="0" restart_interval="100 year" plotfile_root="ms" parallel_silo="1"/>
+
+</Problem>

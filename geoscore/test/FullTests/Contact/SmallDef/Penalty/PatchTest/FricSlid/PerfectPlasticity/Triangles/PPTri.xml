@@ -1,0 +1,115 @@
+<?xml version="1.0" ?>
+
+<!-- Patch test: small deformation contact enforced using penalty method -->
+<!-- 		 Crack face oriented along X                             -->
+<!--             Exact solution expected: u_y = y; u_x = 0;              -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+  <Mesh 
+        externalMeshFile="0"
+	xcoords="-1   1"
+	ycoords="-1   1"
+	nx="2"
+	ny="2"
+	nz="1"
+	elementType="STRI"        
+	regionNames="Region"
+	/>
+  <Units length="m" mass="kg" time="s" temperature="K" mole="mol" />
+
+  <Nodesets>
+    <Nodeset name="xneg2" 
+	     type="0" 
+	     xmin="-1.001 -1.001 0"
+	     xmax="-0.999 -0.999 0" />
+    <Nodeset name="xneg3" 
+	     type="0" 
+	     xmin="-1.001 0.999 0"
+	     xmax="-0.999 1.001 0" />
+    <Nodeset name="xneg4" 
+	     type="0" 
+	     xmin="-1.001 -0.001 0"
+	     xmax="-0.999 0.001 0" />
+    <Nodeset name="xpos2" 
+	     type="0" 
+	     xmin="0.999 -1.001 0"
+	     xmax="1.001 -0.999 0" />
+    <Nodeset name="xpos3" 
+	     type="0" 
+	     xmin="0.999 0.999 0"
+	     xmax="1.001 1.001 0" />
+  </Nodesets>
+
+  <Contact active="1"
+           ImplicitActive="1"
+	   ThreeDTrue="0"
+           PenaltyNormal="1e+07"
+	   PenaltyTau1="1e+04"
+	   NitscheFlag="0"
+           slidingLaw="1"
+           tracYield="0.5"
+           TractionCutoff="0.1">
+  <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+  <Solvers>
+    <LagrangeSmallStrainLinearElastic name="implag2d" 
+				        twoD_option="1"
+                                        tol="1e-12"
+				        useMLPreconditioner="1"
+					useDirectSolver="1"
+       			                useNewtonSolve="1"/>
+  </Solvers>
+
+
+  <Fracture fractureFlag="1" 
+	    preFractureSetName="" 
+            failgap="1e-09"
+	    x1_PreFrac="0.0"
+            y1_PreFrac="-1.0"
+            z1_PreFrac="0"
+            x2_PreFrac="0.0"
+            y2_PreFrac="1.0"
+            z2_PreFrac="0"/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10" dt="1">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="linear" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="384.6153846153846153" Density="1" BulkModulus="833.333333333333"/> 
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0125" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg2" component="1" scale="-0.00375" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg3" component="1" scale="0.00375" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos" component="0" scale="-0.0125" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos" component="1" scale="0.0" fieldtype="Vector" timetable="tv1" />
+  </BoundaryConditions>
+
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="Lame" tablename="Lame" toregion="Region"/>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="ShearModulus" tablename="ShearModulus" toregion="Region"/>
+  </InitialConstitutiveValues>
+  
+  <Tables>
+    <Table1D name="tv1"
+               coord = "0.0,   5.0, 10.0"
+               value = "0.0,   1.0,  0.0" />
+    <Table3D name="Lame" x_file="x" y_file="y" z_file="z" voxel_file="Lame"/>
+    <Table3D name="ShearModulus" x_file="x" y_file="y" z_file="z" voxel_file="ShearModulus"/>
+  </Tables>
+
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="0" writeRestart="1" restart_interval="5" plot_interval="25" plotfile_root="FricSlidTest" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

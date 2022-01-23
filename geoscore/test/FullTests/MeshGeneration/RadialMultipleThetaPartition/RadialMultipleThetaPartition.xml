@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <!-- (put in mesh section after file name: messagesize="200000" -->
+
+  <Units default_units="SI_Units" />
+
+
+  <Mesh 
+    xcoords="1.0 5.0"
+    ycoords="-45 45 135 225 315"
+    zcoords="-2.0 2.0"
+    nx="8"
+    ny="8 8 8 8"
+    nz="4"
+    elementType="C3D8"
+    regionNames="ALL"
+    mapToRadial="1"
+  />
+
+  
+  <Solvers>
+    <LagrangeLargeStrain name="lagsolve"
+                         courant="0.8"
+                         timeIntegrationOption="2"
+                         dampingM="3000"/>
+  </Solvers>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.5">
+      <Apply solver="lagsolve" toregions="ALL"/>
+    </Application>
+  </SolverApplications>
+
+
+  <ElementRegions>
+    <ElementRegion name="ALL" elementtype="poly">
+      <LinearElasticMaterial ShearModulus="12.0e9" Density="1e6" BulkModulus="20.0e9" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+  <BoundaryConditions>
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="rout" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="rout" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="rout" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="rout" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="zneg" component="2" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="zpos" component="2" scale="0.0" fieldtype="Vector" />
+
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="rin" component="0" scale="0.01" fieldtype="Vector" />
+  </BoundaryConditions>
+  
+  
+  <Tables>
+    <Table1D name="ttable" 
+             coord="0.0, 1e9"
+             value="1.0, 1.0" />
+  </Tables>
+  
+  
+  <Partition>
+    <SpatialPartition xpar="2" ypar="4" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="0" restart_interval="0.25" plotfile_root="RadialMultipleThetaPartition" parallel_silo="1"  />
+
+</Problem>

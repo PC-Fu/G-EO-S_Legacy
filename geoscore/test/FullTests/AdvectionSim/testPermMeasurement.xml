@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+
+  <!-- srun -ppdebug -n2 GPAC.x -i testFlow.xml -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units length="mm" mass="g" time="s" temperature="K" mole="mol" />
+
+  <!--% <Parameter meshFile="Aperture.inp"/>-->
+ <Parameter meshFile="ApertureSmall.inp"/> 
+
+
+  <Solvers>
+      <SteadyStateParallelPlateFlowSolver_TwoD name="pvSolver"
+                                          tol="1e-10" 
+                                          faceset="Zmax" verbose="0" 
+                                          MaximumAperture="0.2 mm"/>
+
+      <WriteFieldToFile name="YminFlux"
+                 fieldname="VolumetricFlux"
+                 fileprefix="Ymin.Flux"
+                 objecttype="Edge"
+                 setname = "YminZmax"
+                 append="1" 
+                 dt="1s"/>
+
+      <WriteFieldToFile name="YmaxFlux"
+                 fieldname="VolumetricFlux"
+                 fileprefix="Ymax.Flux"
+                 objecttype="Edge"
+                 setname = "YmaxZmax"
+                 append="1" 
+                 dt="1s"/>
+
+      <WriteFieldToFile name="XminFlux"
+                 fieldname="VolumetricFlux"
+                 fileprefix="Xmin.Flux"
+                 objecttype="Edge"
+                 setname = "XminZmax"
+                 append="1" 
+                 dt="1s"/>
+
+      <WriteFieldToFile name="XmaxFlux"
+                 fieldname="VolumetricFlux"
+                 fileprefix="Xmax.Flux"
+                 objecttype="Edge"
+                 setname = "XmaxZmax"
+                 append="1" 
+                 dt="1s"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10s" dt="1s">
+         <Apply solver="pvSolver" />  
+         <Apply solver="XminFlux" />  
+         <Apply solver="XmaxFlux" />  
+         <Apply solver="YminFlux" />  
+         <Apply solver="YmaxFlux" />  
+    </Application>  
+  </SolverApplications>
+
+  <Tables>
+    <Table2D name="ApertureTable" value_file="Aperture_values.txt" x_file="Aperture_x_ticks.txt" y_file="Aperture_y_ticks.txt" 
+x_units="cm" y_units="cm" value_units="mm"/>
+  </Tables>
+
+  <Mesh file="$:meshFile" units="cm" />
+
+  <BoundaryConditions>
+<!-- NS BC's -->
+    <SwitchBoundaryConditions function="timeSwitch" setnames="YminZmax" object="Edge">
+      <BoundaryCondition     fieldname="Pressure" scale="1 GPa" />
+      <BoundaryCondition     fieldname="Dummy" scale="0" />
+    </SwitchBoundaryConditions>
+    <SwitchBoundaryConditions function="timeSwitch" setnames="YmaxZmax" object="Edge">
+      <BoundaryCondition     fieldname="Pressure" scale="2 GPa" />
+      <BoundaryCondition     fieldname="Dummy" scale="0" />
+    </SwitchBoundaryConditions>
+
+<!-- EW BC's -->
+    <SwitchBoundaryConditions function="timeSwitch" setnames="XminZmax" object="Edge">
+      <BoundaryCondition     fieldname="Dummy" scale="0" />
+      <BoundaryCondition     fieldname="Pressure" scale="1 GPa" />
+    </SwitchBoundaryConditions>
+    <SwitchBoundaryConditions function="timeSwitch" setnames="XmaxZmax" object="Edge">
+      <BoundaryCondition     fieldname="Dummy" scale="0" />
+      <BoundaryCondition     fieldname="Pressure" scale="2 GPa" />
+    </SwitchBoundaryConditions>
+
+
+  </BoundaryConditions>
+
+  <InitialConditions>
+
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Face" value="1.0" />
+
+<!-- Aperture -->
+    <CalculateFaceCenters/>
+
+    <InitialConditionFunction fieldname="Aperture" fieldtype="Scalar" object="Face" setnames="Zmax" function="ApertureFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector" />
+<!-- Shape surface and mesh elements -->
+     <InitialConditionFunction fieldname="Zshift" fieldtype="Scalar" object="Node" 
+                              function="ApertureFunc"
+                              variables="ReferencePosition"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="ReferencePosition" fieldtype="Vector" component="2" object="Node" 
+                              function="surfaceFunction"
+                              variables="ReferencePosition Zshift"
+                              variableTypes="Vector Scalar" /> 
+  </InitialConditions>
+
+  <Functions>
+
+    <SymbolicFunction name="surfaceFunction"
+                      constants="zMax 0.2cm"
+                      f="z*(1-dz/zMax)"
+                      variables ="x,y,z,dz" />
+
+    <SymbolicFunction name="timeSwitch"
+                      constants="dt 1s"
+                      f="int(t/dt)%2"
+                      variables ="t" />
+
+    <Lookup2DTable name="ApertureFunc" table="ApertureTable" />
+
+  </Functions>
+
+  <Output plot_interval="1s" plotfile_root="sspp2DB" writeFEMEdges="1" writeFEMFaces="1"/>
+</Problem>

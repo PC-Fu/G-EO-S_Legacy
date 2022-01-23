@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!-- This is a problem that tests 1D wave propagation in a bar composed of 2D quad elements. -->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Mesh file="bar.geom"/>
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.04"  >
+      <Apply solver="solver1" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15.0e9" Density="2650" BulkModulus="15.0e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="NS1" 
+                            direction="1.0 0.0 0.0" 
+                            scale="0.01"
+                            timetable="ttable" />
+    
+  </BoundaryConditions>
+
+<!--# This is a comment
+spanning
+multiple 
+lines.  #-->
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0, 0.001, 0.002, 0.003, 1.0e9"
+               value = "0.0,    1.0,    1.0,    0.0,  0.0" />
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="0" plot_interval="4e-3" restart_interval="0.02" plotfile_root="output" parallel_silo="1"/>
+
+</Problem>

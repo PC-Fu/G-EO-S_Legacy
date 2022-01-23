@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+      <SteadyStateParallelPlateFlowSolver name="ssppSolver"
+                                          tol="1e-6" 
+                                          flowRegions="fracture1"
+                                          nonFlowFaces="Zmin Zmax"/> 
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10.01" dt="1.0">
+      <Apply solver="ssppSolver" toregions="fracture1" />
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition     object="Face"
+                           fieldname="Pressure" 
+                           setnames="Ymin"
+                           component="0" 
+                           scale="1.01" />
+    <BoundaryCondition     object="Face"
+                           fieldname="Pressure" 
+                           setnames="Ymax"
+                           component="0" 
+                           scale="0.99" />
+  </BoundaryConditions>
+
+
+  <Output plot_interval="1" plotfile_root="test_sspp" writeFEMFaces="1"  />
+</Problem>

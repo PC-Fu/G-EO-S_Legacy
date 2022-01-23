@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <Mesh 
+        externalMeshFile="0"
+	xcoords="0.0 20.0"
+	ycoords="-10.0 10.0"
+	zcoords="0.0 10.0"
+	nx="20"
+	ny="20"
+	nz="10"
+	elementType="C3D8"
+	regionNames="Region"
+	/>
+
+  <Nodesets>
+    <Nodeset name="center" 
+	     type="0" 
+	     xmin="-100 -0.1 -100"
+	     xmax="100 0.1 100" />
+
+    <Nodeset name="prefrac" 
+	     type="0" 
+	     xmin="0   -0.01 -100"
+	     xmax="2  0.01      2" />
+
+    <Nodeset name="source" 
+	     type="0" 
+	     xmin="-0.5 -0.1 -1"
+	     xmax="1.0  0.1  1.0" />
+
+
+    <Nodeset name="tug" 
+	     type="0" 
+	     xmin="0.5 0.5 -1.5"
+	     xmax="1.5 1.5  1.5" />
+
+    <Nodeset name="tug2" 
+	     type="0" 
+	     xmin="0.5 -1.5 -1.5"
+	     xmax="1.5 -0.5  1.5" />
+
+
+
+
+  </Nodesets>
+
+
+  <ElementRegions>
+    <ElementRegion abaqusID="C3D8" name="Region" elementtype="poly">
+        <LinearElasticMaterial ShearModulus="3.0e9 Pa" Density="1000 kg / m^3" BulkModulus="10.0e9 Pa"/>
+    </ElementRegion>
+  </ElementRegions>
+
+
+  <InitialConditions>
+  </InitialConditions>
+
+
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+
+
+  <Fracture fractureFlag="1" 
+	    failCriterion="2"
+	    verbose="0" 
+	    type="InitiallyRigidCohesiveZone"
+	    rockToughness="0.5e6"
+	    failstress="1.0e5 Pa"
+	    failgap="0.1 m"
+	    separableSet="center"
+	    preFractureSetName="prefrac"
+	    unloadFlag="0"
+	    />
+

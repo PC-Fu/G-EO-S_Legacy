@@ -1,0 +1,205 @@
+
+# make sure that you choose a compiler version using the "use" command, or by changing your path
+#
+# icc example: use ic-13.0.117
+# use mvapich2-intel-1.7
+#
+#  - or - 
+#
+# place "/usr/apps/gnu/4.7.1/bin" first in your path
+# use mvapich2-gnu-1.7
+
+
+# other prerequisites include:
+#   1) an installation of MPI (e.g., OpenMPI or MPICH)
+#   2) BLAS
+#   3) LAPACK
+# NOTE: remember to set the DYLD_LIBRARY_PATH variable to external_libs/lib
+
+
+SERIAL_CPP=g++-4.8
+SERIAL_CC=gcc-4.8
+SERIAL_F90=gfortran-4.8
+SERIAL_F77=gfortran-4.8
+
+DEBUG?=1
+EXT_DEBUG=0
+COMPILER?=gcc
+HAVE_MPI=1
+HAVE_GMM=0
+PROFILE?=0
+WRITE_FACENODE=0
+
+# make core only even if internal or external present
+MAKE_CORE_ONLY=0
+
+# make external even when internal present
+MAKE_EXTERNAL=0
+
+SZIP_PATH ?= /usr/gapps/silo/szip/2.1/chaos_4_x86_64_ib_icc
+
+
+# Geodyn Material model library
+GMML_INC=./
+GMML_LIBPATH=./
+GMML_LIB=geodyn_mat_lib
+
+
+-include Make.local.defs.$(shell whoami)
+
+
+
+LNK_FLAGS_TRILINOS= -ltrilinoscouplings -llocathyra -llocaepetra -llocalapack -lloca -lnoxepetra -lnoxlapack -lnox -lintrepid -lstratimikos -lstratimikosbelos -lstratimikosaztecoo -lstratimikosamesos -lstratimikosml -lstratimikosifpack -lanasazitpetra -lModeLaplace -lanasaziepetra -lanasazi -lbelostpetra -lbelosepetra -lbelos -lml -lifpack -lpamgen_extras -lpamgen -lamesos -lgaleri-xpetra -lgaleri -laztecoo -lisorropia -lthyratpetra -lthyraepetraext -lthyraepetra -lthyracore -lthyratpetra -lthyraepetraext -lthyraepetra -lthyracore -lxpetra-sup -lxpetra-ext -lxpetra -lepetraext -ltpetraext -ltpetrainout -ltpetra -ltriutils -lshards -lzoltan -lepetra -lkokkosdisttsqr -lkokkosnodetsqr -lkokkoslinalg -lkokkosnodeapi -lkokkos -lkokkosdisttsqr -lkokkosnodetsqr -lkokkoslinalg -lkokkosnodeapi -lkokkos -lrtop -lsacado -ltpi -lteuchosremainder -lteuchosnumerics -lteuchoscomm -lteuchosparameterlist -lteuchoscore -lteuchosremainder -lteuchosnumerics -lteuchoscomm -lteuchosparameterlist -lteuchoscore -llapack -lblas
+
+LNK_FLAGS= -lsiloh5 -lhdf5 -lfp -ldc3d -lmetis
+# -lhdf5_cpp -lhdf5_hl -lhdf5_hl_cpp
+
+LIBPATH_FLAGS=
+
+CPP_FLAGS+= -DWRITE_SILO_OUT=1
+
+
+
+ifeq ($(COMPILER), xlc)
+	SERIAL_CC=bgxlc
+	SERIAL_CPP=bgxlc++
+	SERIAL_F77=bgf77
+	SERIAL_F90=bgxlf90
+
+	CC=mpixlc
+	CPP=mpixlcxx
+	F77=mpixlf77
+	F90=mpixlf90
+
+	CC_FLAGS=-qnoextname
+	CPP_FLAGS=-qstrict
+	F77_FLAGS=-qnoextname
+	F90_FLAGS=-qnoextname
+
+	LIBPATH_FLAGS+=-L/usr/local/tools/blas/lib/ -L/usr/local/tools/lapack/lib/ -L/opt/ibmcmp/xlf/bg/14.1/bglib64 -L/usr/local/tools/zlib-1.2.6/lib -L/usr/gapps/silo/hdf5/1.8.10/bgqos_0_bgxlc/lib -L/usr/gapps/silo/szip/2.1/bgqos_0_bgxlc/lib
+	LNK_FLAGS_TRILINOS+=  -lxlopt -lxl -lxlf90 -lxlfmath 
+#$(EXTERNAL_LIBS)/dc3d/dc3d.o
+	LNK_FLAGS+=  -lz -lsz
+
+	ifeq ($(DEBUG), 0)
+		CC_FLAGS=-O5 -g0 -qnoextname
+		CPP_FLAGS=-O5 -g0 -qstrict
+		F77_FLAGS=-O5 -g0 -qnoextname
+		F90_FLAGS=-O5 -g0 -qnoextname
+	else
+		CC_FLAGS=-O0 -g0 -qnoextname
+		CPP_FLAGS=-O0 -g0 -qstrict 
+		F77_FLAGS=-O0 -g0 -qnoextname
+		F90_FLAGS=-O0 -g0 -qnoextname
+	endif
+	
+        ifeq ($(PROFILE),1)
+		CPP_FLAGS += -pg
+		LNK_FLAGS += -pg
+	endif
+
+else
+
+
+	ifeq ($(DEBUG), 1)
+		CC_FLAGS+=-O0 -g3
+		CPP_FLAGS+=-O0 -g3
+		F77_FLAGS+=-O0 -g3
+		F90_FLAGS+=-O0 -g3
+	else
+		ifeq ($(MAKE_EXTERNAL), 1)
+			# smaller executable, no debug info
+			CC_FLAGS+=-O3 -g0
+			CPP_FLAGS+=-O3 -g0
+			F77_FLAGS+=-O3 -g0
+			F90_FLAGS+=-O3 -g0
+		else
+			CC_FLAGS+=-O3 -g
+			CPP_FLAGS+=-O3 -g
+			F77_FLAGS+=-O3 -g
+			F90_FLAGS+=-O3 -g
+		endif
+	endif
+	
+	ifeq ($(COMPILER), icc)
+		SERIAL_CC=icc
+		SERIAL_CPP=icpc
+		SERIAL_F77=ifort
+		SERIAL_F90=ifort
+
+		CC=mpicc
+		CPP=
+
+		F77=mpif77
+		F90=mpif90
+
+#		CPP_FLAGS+= -DWRITE_SILO_OUT -w3 -Wall -wd593 -Wpointer-arith -Wreturn-type -Wshadow -Wsign-compare -Wstrict-aliasing -Wuninitialized -Wunused-variable -Wno-unused-function -Wno-unused-parameter -Wreorder -fp-model precise -fp-model source -std=c++11 -pedantic -Woverloaded-virtual
+		CPP_FLAGS+= -DWRITE_SILO_OUT -w3 -Wall -Wpointer-arith -Wreturn-type -Wshadow -Wsign-compare -Wstrict-aliasing -Wuninitialized -Wunused-variable -Wno-unused-function -Wno-unused-parameter -Wreorder -fp-model precise -fp-model source -pedantic -Woverloaded-virtual  -std=c++11 
+
+		ifeq ($(EXT_DEBUG), 0)
+			EXTERNAL_LIBS=/usr/gapps/GEOS/external_libs_icc_opt
+		else
+			EXTERNAL_LIBS=/usr/gapps/GEOS/external_libs_icc_dbg
+		endif
+
+		SILO_CONFIG_FLAGS= LDFLAGS=-L/usr/lib64 \
+							--enable-optimization \
+							--with-readline
+
+	endif
+	
+	ifeq ($(COMPILER), gcc)
+		SERIAL_CC=gcc-4.8
+		SERIAL_CPP=g++-4.8
+		SERIAL_F77=gfortran-4.8
+		SERIAL_F90=gfortran-4.8
+
+#		CPP_FLAGS+= -DWRITE_SILO_OUT -Wabi -Wall -Wextra -Wshadow -Wno-unused-parameter -Wno-unused-function -std=c++11 -pedantic -Woverloaded-virtual -Wnounused-local-typedefs -Wno-unused-function
+		CPP_FLAGS+= -DWRITE_SILO_OUT -Wabi -Wall -Wextra -Wshadow -Wno-unused-parameter -Wno-unused-function -pedantic -Woverloaded-virtual -Wno-unused-local-typedefs -Wno-long-long -Wno-unused-function -std=c++11 
+
+		CC=mpicc
+		CPP=mpicxx
+		F77=mpif77
+		F90=mpif90
+
+		EXTERNAL_LIBS=/usr/gapps/GEOS/external_libs_gcc
+		
+		ifeq ($(PROFILE),1)
+			CPP_FLAGS += -pg
+			LNK_FLAGS += -pg
+		endif
+	endif
+
+	ifeq ($(COMPILER), mac)
+		SERIAL_CC=gcc48
+		SERIAL_CPP=g++48
+		SERIAL_F77=gfortran48
+		SERIAL_F90=gfortran48
+
+		CC=mpicc
+		CPP=mpic++
+		F77=mpif77
+		F90=mpif90
+
+#		CPP_FLAGS+= -DWRITE_SILO_OUT -Wabi -Wall -Wextra -Wshadow -Wno-unused-parameter -Wno-unused-function -std=c++11 -pedantic -Woverloaded-virtual -Wnounused-local-typedefs
+		CPP_FLAGS+= -DWRITE_SILO_OUT -Wabi -Wall -Wextra -Wshadow -Wno-unused-parameter -Wno-unused-function -pedantic -Woverloaded-virtual -Wno-unused-local-typedefs -Wno-long-long  -std=c++11 
+		SZIP_PATH=/opt/local
+
+		ifeq ($(DEBUG), 0)
+	 		CC_FLAGS+= -funroll-loops-mfpmath=sse -msse3 -march=core2
+		endif
+	
+		LNK_FLAGS += -DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -framework vecLib -lteuchosremainder -lteuchosparameterlist -lteuchosnumerics -lteuchoscore -lteuchoscomm
+
+		SILO_CONFIG_FLAGS = LDFLAGS=-L/opt/local/lib \
+		 					--enable-optimization \
+							--with-readline \
+							CPPFLAGS=-I/opt/local/include
+
+		ifeq ($(PROFILE),1)
+			CPP_FLAGS += -pg
+			LNK_FLAGS += -pg
+		endif
+	endif	
+endif
+

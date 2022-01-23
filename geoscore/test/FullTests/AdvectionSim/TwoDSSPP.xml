@@ -1,0 +1,232 @@
+<?xml version="1.0" ?>
+
+  <!-- srun -ppdebug -n2 GPAC.x -i TwoDSSPP.xml -xpar 2 -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units length="mm" mass="g" time="s" temperature="K" mole="mol" >
+    <AddUnit name="ha" value="10000 m^2" />
+  </Units>
+
+  <Include file="VolumeFractions.xml"/>
+<!--%  <Parameter meshFile="FlatFracture.inp"/>-->
+ <Parameter meshFile="Aperture.inp"/>
+ <!-- <Parameter meshFile="ApertureSmall.inp"/> -->
+  <Parameter QK="0.35906"/>
+
+ <!-- <ChemistryDatabase name="llnl.dat" /> -->
+
+  <Solvers>
+      <SteadyStateParallelPlateFlowSolver_TwoD name="pvSolver"
+                                          tol="1e-12" 
+                                          faceset="Zmax" verbose="0" 
+                                          MaximumAperture="0.2 mm"/>
+   <!--   <SteadyStateParallelPlateADRSolver name="ssadrSolver" 
+                                         adrSolver="adrSolver"
+                                         faceset="Zmax"
+                                         tol="0.001" 
+                                         speciesList="C Ca"
+                                         diffusiveLengthScale="1">
+          <ReactionRateFunctions>
+             <ReactionRateFunction species="C" 
+                                   function="C_ReactionRateFunction"
+                                   variables="C_reactionRate"/>
+             <ReactionRateFunction species="Ca" 
+                                   function="Ca_ReactionRateFunction"
+                                   variables="Ca_reactionRate"/>
+          </ReactionRateFunctions>
+      </SteadyStateParallelPlateADRSolver>
+-->
+      <ParallelPlateADRSolver name="adrSolver" tol="1e-14" faceset="Zmax" 
+                              species="C" reactionRateField="C_ReactionRate" 
+                              Diffusivity="1e-9 m^2/s" doDataWrite="0"/>
+
+      <ParallelPlateADRSolver name="adrSolverCa" tol="1e-14" faceset="Zmax"
+                              species="Ca" reactionRateField="Ca_ReactionRate"  
+                              Diffusivity="1e-9 m^2/s" doDataWrite="0"/>
+         
+ 
+      <ReactionFrontSolver name="reactionFrontUpdate"
+                           faceset="Zmax"
+                           temperature="60">    
+        <SolidFronts
+            names = "CaCO3_1, CaCO3_2, Portlandite"
+            equilibrium_constants = "K_CaCO3, K_CaCO3, K_ch"
+            initial_positions = "0.001mm, 0.002mm, 0.003mm"
+            front_conditions = "$:QK*q_Ca+2 + $:QK*q_CaHCO3+ + $:QK*q_CaCO3 = q_CaHCO3+ + q_CaCO3 + q_CO3-2 + q_HCO3- + q_H2CO3 + q_CO2;
+                                q_Ca+2 + q_CaHCO3+ + q_CaCO3 = q_CaHCO3+ + q_CaCO3 + q_CO3-2 + q_HCO3- + q_H2CO3 + q_CO2;
+                                q_CaHCO3+ + q_CaCO3 + q_CO3-2 + q_HCO3- + q_H2CO3 + q_CO2 = 0"
+            dissolution_rates = "q_Ca+2 + q_CaHCO3+ + q_CaCO3;
+                                 -1*q_Ca+2 + -1*q_CaHCO3+  + -1* q_CaCO3;
+                                 q_Ca+2 + q_CaHCO3+ + q_CaCO3"
+            molar_densities = "$:mrho_CaCO3_csh, $:mrho_CaCO3, $:mrho_ch"/>
+
+        <Regions 
+            names = "SiO2, CaCO3, chDepleated, Portlandite"
+            solid_phases = "SiO2; CaCO3, csh; csh; Portlandite, csh"/>
+
+        <SolidPhases
+            names = "SiO2, CaCO3, csh, Portlandite"
+            volume_fractions = "$:vf_SiO2, $:vf_CaCO3, $:vf_csh, $:vf_ch" 
+            molar_masses="$:MM_SiO2, $:MM_CaCO3, $:MM_csh, $:MM_ch " 
+            densities =  "$:rho_CaCO3, $:rho_SiO2, $:rho_csh, $:rho_ch" />
+
+        <Species names = "H+, OH-, Ca+2, CaHCO3+, CaCO3, CO3-2, HCO3-, H2CO3, CO2"
+                 valences = "1, -1, 2, 1, 0, -2, -1, 0, 0"   
+                 equilibrium_constants = "Kw, K2, K3, K4, K5, K6"              
+                 diffusivity = "1e-10m^2/s" />
+
+        <Elements names = "Ca, C" 
+                  species = "Ca+2, CaHCO3+, CaCO3; 
+                             CaHCO3+, CaCO3, CO3-2, HCO3-, H2CO3, CO2"
+                  brine_concentrations = "1e-4 mol/l,1e-4 mol/l"/>
+
+        <EquilibriumData
+                 equilibrium_equations= 
+                           "Kw = [H+][OH-];
+                            K2 = [H+][CO3-2]/[HCO3-] ;
+                            K3 = [Ca+2][HCO3-]/[CaHCO3+] ;
+                            K4 = [Ca+2][CO3-2]/[CaCO3];
+                            K5 = [H+][HCO3-]/[H2CO3] ;
+                            K6 = [H+][HCO3-]/[CO2][H2O];
+                            K_ch = [Ca+2]/[H+]^2 ;
+                            K_CaCO3 = [HCO3-][Ca+2]/[H+] ;
+                            K_csh = [Ca+2]^1.666666666/[H+]^3.33333333"
+                 logKdata=" Kw, 22.801,      -0.010365,    -4787.3,   -7.1321,    0.0;
+                            K2, -107.8871,  -0.03252849,   5151.79,   38.92561, -563713.9; 
+                            K3, -1209.120,     -0.31294,      34765.05,  478.782,    0.0 ;  
+                            K4, 1228.732,      0.299444,    -35512.75,  -485.818,    0.0  ;
+                            K5, 1.000393128530148,  0.0,        0.0,      0.0,   0.0   ;
+                            K6, -356.3094, -0.060919964,  21834.37,  126.8339, -1684915;
+                            K_ch,-8.3848e+001, -1.8373e-002, 9.3154e+003, 3.2584e+001, -1.4538e+002;
+                            K_CaCO3,-1.4978e+002, -4.8370e-002, 4.8974e+003, 6.0458e+001, 7.6464e+001;
+                            K_csh,   272.602665,  0.058756104, -903.9172332, -104.1248858, 0.0 "
+         />
+      </ReactionFrontSolver>
+
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="100.0s" dt="0.05s">
+
+         <Apply solver="pvSolver" toregions="fracture1" /> 
+  <!--   <Apply solver="ssadrSolver" toregions="fracture1" /> -->
+     <Apply solver="adrSolver" toregions="fracture1" /> 
+     <Apply solver="adrSolverCa" toregions="fracture1" />  
+     <Apply solver="reactionFrontUpdate" toregions="fracture1" /> 
+    </Application>  
+  </SolverApplications>
+
+  <Tables>
+    <Table2D name="ApertureTable" value_file="Aperture_values.txt" x_file="Aperture_x_ticks.txt" y_file="Aperture_y_ticks.txt" x_units="cm" y_units="cm" value_units="mm"/>
+  </Tables>
+
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+
+  <ElementRegions>
+  </ElementRegions>
+
+  <Mesh file="$:meshFile" units="cm" />
+
+  <BoundaryConditions>
+<!-- Hydraulic boundary conditions -->
+  <!--   <BoundaryCondition     object="Edge"
+                           fieldname="Pressure" 
+                           setnames="YminZmax"
+                           scale="2.01 MPa" /> -->
+
+   <BoundaryCondition      object="Edge"
+                           fieldname="Pressure" 
+                           setnames="YmaxZmax"
+                           scale="2.0 MPa" />
+
+
+   <BoundaryCondition      object="Edge"
+                           fieldname="FixedFlux" 
+                           setnames="YminZmax"
+                           scale="0.05 cc/minute" />
+
+
+<!-- Transport boundary conditions -->
+
+    <BoundaryCondition     object="Edge"
+                           fieldname="C" 
+                           setnames="YminZmax"
+                           scale="0.03 mol/L" />
+    <BoundaryCondition     object="Edge" 
+                           fieldname="C" 
+                           setnames="YmaxZmax"
+                           scale="0.0"
+                           component="2" /> <!-- Fixme - used to indicate outflow bc -->
+
+    <BoundaryCondition     object="Edge"
+                           fieldname="Ca" 
+                           setnames="YminZmax"
+                           scale="1e-10 mol/L" />
+
+    <BoundaryCondition     object="Edge" 
+                           fieldname="Ca" 
+                           setnames="YmaxZmax"
+                           scale="0.0"
+                           component="2" /> <!-- Fixme - used to indicate outflow bc -->
+  </BoundaryConditions>
+
+  <InitialConditions>
+
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Face" value="2.0MPa" />
+
+    <ConstantInitialCondition fieldname="Ca" fieldtype="Scalar" object="Face" setnames="Zmax" value="1e-4 mol/l" /> 
+    <ConstantInitialCondition fieldname="C" fieldtype="Scalar" object="Face" setnames="Zmax" value="1e-4 mol/l" />
+    <ConstantInitialCondition fieldname="Si" fieldtype="Scalar" object="Face" value="0" />
+    <ConstantInitialCondition fieldname="CO2" fieldtype="Scalar" object="Face" value="0" />
+
+
+    <ConstantInitialCondition fieldname="Permeability" fieldtype="Scalar" object="Edge" value="-1" />
+
+    <ConstantInitialCondition fieldname="FlowSurface" object="Face" setnames="Zmax" value="1.0" />
+
+    <ConstantInitialCondition fieldname="x_rf_0" object="Face" value="1e-4" />
+
+<!-- Aperture -->
+    <CalculateFaceCenters/>
+
+    <InitialConditionFunction fieldname="Aperture" fieldtype="Scalar" object="Face" setnames="Zmax" function="ApertureFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector" />
+
+<!-- Shape surface and mesh elements -->
+     <InitialConditionFunction fieldname="Zshift" fieldtype="Scalar" object="Node" 
+                              function="ApertureFunc"
+                              variables="ReferencePosition"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="ReferencePosition" fieldtype="Vector" component="2" object="Node" 
+                              function="surfaceFunction"
+                              variables="ReferencePosition Zshift"
+                              variableTypes="Vector Scalar" /> 
+
+  </InitialConditions>
+
+  <Functions>
+
+    <SymbolicFunction name="surfaceFunction"
+                      constants="zMax 0.2cm"
+                      f="z*(1-dz/zMax)"
+                      variables ="x,y,z,dz" />
+
+    <SymbolicFunction name="surfaceFunctionB"
+                      f="1+z+0.2*sin(x/50)+sin(x/5+y/20)"
+                      variables ="x,y,z" />
+
+<!-- Aperture function -->
+ <!--   <ConstantFunction name="ApertureFunc" f="0.1 mm"/>-->
+ <!--   <UniformRandomDistribution name="ApertureFunc" min="0.0" max="0.1mm" />-->
+    <Lookup2DTable name="ApertureFunc" table="ApertureTable" />
+
+  </Functions>
+
+  <Output plot_interval="1s" plotfile_root="/p/lscratchd/walsh24/Wellbore/Simulations/sspp2DB" writeFEMEdges="1" writeFEMFaces="1"/>
+</Problem>

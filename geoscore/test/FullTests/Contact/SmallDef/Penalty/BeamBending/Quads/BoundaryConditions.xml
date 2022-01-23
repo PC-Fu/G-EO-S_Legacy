@@ -1,0 +1,30 @@
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg1" component="0" scale="0.00800000000000000017"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg1" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg2" component="0" scale="0.00533333333333333402"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg2" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg3" component="0" scale="0.00266666666666666701"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg3" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg4" component="0" scale="-0.00000000000000000000"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg4" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg5" component="0" scale="-0.00266666666666666614"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg5" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg6" component="0" scale="-0.00533333333333333229"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg6" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg7" component="0" scale="-0.00800000000000000017"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg7" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos1" component="0" scale="-0.00800000000000000017"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos1" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos2" component="0" scale="-0.00533333333333333402"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos2" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos3" component="0" scale="-0.00266666666666666701"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos3" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos4" component="0" scale="0.00000000000000000000"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos4" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos5" component="0" scale="0.00266666666666666614"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos5" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos6" component="0" scale="0.00533333333333333229"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos6" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos7" component="0" scale="0.00800000000000000017"fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos7" component="1" scale="-0.01600000000000000033"fieldtype="Vector" timetable="tv1" />
+

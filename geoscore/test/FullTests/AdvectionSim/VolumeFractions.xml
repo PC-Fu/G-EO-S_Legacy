@@ -1,0 +1,67 @@
+
+<!-- Volume fraction -->
+<Parameter 
+   vf_ch   = "0.27" 
+   vf_csh  = "0.68" 
+   vf_CaCO3= "0.31"
+   vf_SiO2 = "`0.611*$:vf_csh`"  vf_SiO2_old="0.41548"  
+/>
+<!--  vf_SiO2 ~= vf_csh * CSH mol/cm^3 / SiO2 mol/cm^3 ~= 0.611*vf_csh, to give same # mols Si/cm^3 -->
+
+<!-- Porosity -->
+<Parameter 
+   phi_pc = "1-($:vf_ch + $:vf_csh)"
+   phi_csh = "1-$:vf_csh" 
+   phi_chd = "1-$:vf_csh" 
+   phi_CaCO3 = "1-$:vf_csh-$:vf_CaCO3" 
+   phi_SiO2 = "1- $:vf_SiO2" 
+   phi_b = "1" 
+/>
+
+
+<!-- Density -->
+<Parameter 
+   rho_ch = "2.23 g/cm^3"
+   rho_csh = "2.6 g/cm^3" 
+   rho_CaCO3 = "2.71 g/cm^3"
+   rho_SiO2 = "2.2 g/cm^3"
+/>
+
+<!-- Molar mass -->
+<Parameter 
+  MM_Ca = "40.08 g/mol"
+  MM_ch = "74.09 g/mol" 
+  MM_SiO2  = " 60.0844 g/mol"
+  MM_CaCO3 = "100.0869 g/mol"
+  MM_csh   = "118 g/mol"   
+/>
+
+<!-- Delta Molar density - [(rho*vf)]/MM -->
+<Parameter   
+ mrho_CaCO3 = "0.0083937 mol/cm^3"
+ mrho_csh = "0.014983 mol/cm^3"
+ mrho_ch = "0.0081266 mol/cm^3"
+ mrho_CaCO3_csh = "0.0233767 mol/cm^3"
+/>
+
+<!-- initial brine concentrations -->
+<Parameter   
+ brine_C = "8e-3 mol/l"
+ brine_Ca = "0.035 mol/l"
+ brine_Cl = "1.112 mol/l"
+ brine_Mg = "0.016 mol/l"
+ brine_Na = "1.092 mol/l"
+ brine_S  = "0.037 mol/l" 
+ brine_Si = "0.019337 mol/l"
+/>
+
+<!-- influx concentrations -->
+<Parameter   
+ influx_C = "0.36 mol/l"
+ influx_Ca = "0.035 mol/l"
+ influx_Cl = "1.112 mol/l"
+ influx_Mg = "0.016 mol/l"
+ influx_Na = "1.092 mol/l"
+ influx_S  = "0.037 mol/l"
+ influx_Si = "0.019337 mol/l"
+/>

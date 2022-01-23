@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<Problem>
+  <Units length="m" mass="kg" time="s" temperature="K" mole="mol" />
+  <Include file="line.xml"/>
+
+  <Solvers>
+    <Hydrofracture name="hfsolve"
+		   useMLPreconditioner="0"
+                   timeIntegration="Implicit"
+                   ppSolverName="ppsolve"
+                   lgSolverName="lagsolve"
+		   tol="1.0e-8"/>
+
+    <LagrangeSmallStrainLinearElastic name="lagsolve" 
+                                      tol="1e-6"
+				      useMLPreconditioner="0"/>
+
+    <ParallelPlateFlowSolverFV name="ppsolve" 
+			       tol="1e-6"
+			       useDirectSolver="0"
+			       useMLPreconditioner="0"
+			       verbose="0"
+			       UpdateAperture="1"
+			       MinimumAperture="0.0001 mm"
+			       MaximumAperture="10 cm"
+			       ZeroApertureVolume="0.05 mm"
+			       phi="0.5"
+			       mu="0.001 Pa.s"
+			       BulkModulus="2e9 Pa"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10.0 s" dt="1.0 s">
+      <Apply solver="hfsolve" toregions="Region"/>
+    </Application>  
+
+  </SolverApplications>
+
+
+
+
+
+
+  <InitialConditions>
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Face" value="0.0 MPa" />
+  </InitialConditions>
+
+
+  <BoundaryConditions>
+
+<!--    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xminymax" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xminymin" component="1" scale="-0.0" fieldtype="Vector" /> -->
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" /> 
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="2" scale="0.0" fieldtype="Vector" /> 
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="2" scale="0.0" fieldtype="Vector" />
+
+<!--
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="tug" component="1" scale="1.0e-3" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="tug2" component="1" scale="-1.0e-3" fieldtype="Vector" />
+-->
+
+    <BoundaryCondition object="Face" fieldname="MassRate" setnames="source" scale="1.0" table="ptable" /> 
+<!--    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos" component="0" scale="1.0" fieldtype="Vector" />
+
+    <BoundaryCondition object="Edge" fieldname="Pressure" setnames="source" scale="10.0 MPa" timetable="ptable"  /> 
+-->
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="ptable" 
+               coord = "0.0,  10.0,  1.0e9"
+               value = "0.0,  10.0, 10.0" />
+  </Tables>
+
+
+  <Output  writePlot="1"
+	   plot_interval="1.0"
+	   writeRestart="0"
+	   restart_interval="100.0"
+	   plotfile_root="test" 
+	   writeFEMFaces="1" 
+	   writeFEMEdges="1" 
+	   parallel_silo="1" />
+</Problem>

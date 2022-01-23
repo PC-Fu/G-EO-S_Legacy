@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+
+<!-- Patch test: small deformation contact enforced using penalty method -->
+<!-- 		 Crack face oriented along X                             -->
+<!--             Exact solution expected: u_y = y; u_x = 0;              -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+  <Mesh 
+        externalMeshFile="0"
+        xcoords="0 1"
+	ycoords="0 1"
+	nx="4"
+	ny="4"
+	regionNames="Region"
+	elementType="CPE4"
+	/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+
+  <Nodesets>
+    <Nodeset name="yneg2" 
+	     type="0" 
+	     xmin="-0.0001 -0.0001 0"
+	     xmax=" 0.0001  0.0001 0" />
+  </Nodesets>
+
+  <Solvers>
+    <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                      tol="1e-10"
+				      useDirectSolver="1"
+				      useNewtonSolve="1"/>
+  </Solvers>
+
+  <Contact active="1"
+           ImplicitActive="1"
+           penetrationTol="1e-06"
+	   ThreeDTrue="0"
+           PenaltyNormal="1e+06"
+	   PenaltyTau1="1e+06"
+	   NitscheFlag="0">
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+
+  <Fracture fractureFlag="1" 
+	    preFractureSetName="" 
+            failgap="0.0004"
+	    x1_PreFrac="0.25, 0.50, 0.75"
+            y1_PreFrac="0.50, 0.50, 0.50"
+            z1_PreFrac="0.00, 0.00, 0.00"
+            x2_PreFrac="0.50, 0.50, 0.50"
+            y2_PreFrac="0.75, 0.75, 0.75"
+            z2_PreFrac="0.00, 0.00, 0.00"/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10" dt="1">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="poly" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="0.5" Density="1" BulkModulus="0.333333333333333"/> <!-- Should specify the normal and tangential penalty parameter here -->
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos" component="1" scale="-0.4" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg2" component="0" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" timetable="tv1" />
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="tv1"
+               coord = "0.0,  10.0"
+               value = "0.0,  1.0" />
+
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="0" plot_interval="1" restart_interval="5" plotfile_root="tangent" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

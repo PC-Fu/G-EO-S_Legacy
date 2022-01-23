@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0e-3" dt="2.0e-6">
+      <Apply solver="solver1" toregions="PM1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="PM1" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15.0e9" BulkModulus="15.0e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition      fieldname="Velocity" 
+                            setnames="xneg" 
+                            direction="1.0 0.0 0.0" 
+                            scale="0.01"
+                            timetable="ttable" />
+    
+  </BoundaryConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord = "0.0, 0.001, 0.002, 0.003, 1.0e9"
+               value = "0.0,   1.0,   1.0,   1.0,  1.0" />
+  </Tables>
+    
+  <Output  plot_interval="1.0e-4" plotfile_root="output" parallel_silo="1"/>
+
+</Problem>

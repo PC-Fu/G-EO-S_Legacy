@@ -1,0 +1,197 @@
+<?xml version="1.0" ?>
+<!-- GPAC.x -i DeformTwoSurface.xml -->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units length="mm" mass="g" time="s" temperature="K" mole="mol" />
+
+  <!-- <Parameter meshFile="TwoCylinderHalves.inp"/> -->
+ <Parameter meshFile="SurfaceData/Ohaaki/Ohaaki1.inp"/>
+ <!-- <Parameter meshFile="SurfaceData/Ohaaki/Ohaaki1Small.inp"/>-->
+  <!--  <Parameter meshFile="SurfaceData/Ohaaki/Ohaaki1Eighth.inp"/>-->
+  <Parameter maxConfPressure="20 MPa"/>
+
+  <!-- SOLVERS -->
+  <Solvers>
+      
+    <!--  <LagrangeExplicitDynamicsSolver name="ledSolver" courant="0.5" /> -->
+
+      <ImplicitMechanicsSolver3D name="ledSolver" tol="1e-10" UpdateAperture="1" />
+      <SteadyStateParallelPlateFlowSolver_TwoD name="pvSolver"
+                                          tol="1e-10" 
+                                          faceset="Zmax_Floor" verbose="0" 
+                                          MinimumAperture="1e-7 mm"
+                                          MaximumAperture="0.2 mm"/>
+  </Solvers>
+
+  <!-- SOLVER APPLICATIONS -->
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10 us" dt="1us">
+       <Apply solver="ledSolver" toregions="Fracture_Floor Fracture_Roof" /> 
+       <Apply solver="pvSolver" toregions="Fracture_Floor" /> 
+    </Application>  
+  </SolverApplications>
+
+
+  <!-- MESH -->
+  <Mesh file="$:meshFile" units="cm" />
+
+  <!-- BOUNDARY CONDITIONS -->
+  <BoundaryConditions>
+    <!-- Fracture flow boundary conditions -->
+    <BoundaryCondition     object="Edge"
+                           fieldname="Pressure" 
+                           setnames="XminZmax_Floor"
+                           scale="2.0 MPa" />
+    <BoundaryCondition     object="Edge"
+                           fieldname="Pressure" 
+                           setnames="XmaxZmax_Floor"
+                           scale="2.05 MPa" />
+
+    <!-- Traction boundary conditions -->	
+
+    <NonPenetratingBoundaryCondition
+                               setnames="Zmax_Floor Zmin_Roof"  />
+
+    <TractionBoundaryCondition setnames="Zmax_Roof" 
+	                       direction="0.0 0.0 -1.0" 
+			       scale="$:maxConfPressure"
+			       timetable="tractionTable" />
+
+    <TractionBoundaryCondition setnames="Ymin_Floor Ymin_Roof" 
+                               direction="0.0 1.0 0.0" 
+			       scale="$:maxConfPressure"
+                               timetable="tractionTable" />
+
+    <TractionBoundaryCondition setnames="Ymax_Floor Ymax_Roof" 
+                               direction="0.0 -1.0 0.0" 
+			       scale="$:maxConfPressure"
+                               timetable="tractionTable" />
+
+
+    <TractionBoundaryCondition setnames="Xmin_Floor Xmin_Roof" 
+                               direction="1.0 0.0 0.0" 
+			       scale="$:maxConfPressure"
+                               timetable="tractionTable" />
+
+    <TractionBoundaryCondition setnames="Xmax_Floor Xmax_Roof" 
+                               direction="-1.0 0.0 0.0" 
+			       scale="$:maxConfPressure"
+                               timetable="tractionTable" />	
+
+     <BoundaryCondition fieldname="Velocity" setnames="Zmin_Floor" component="0" scale="0.0" />
+     <BoundaryCondition fieldname="Velocity" setnames="Zmin_Floor" component="1" scale="0.0" />
+     <BoundaryCondition fieldname="Velocity" setnames="Zmin_Floor" component="2" scale="0.0" />
+
+
+     <BoundaryCondition fieldname="Displacement" setnames="Zmin_Floor" component="0" scale="0.0"/>
+     <BoundaryCondition fieldname="Displacement" setnames="Zmin_Floor" component="1" scale="0.0"/>
+     <BoundaryCondition fieldname="Displacement" setnames="Zmin_Floor" component="2" scale="0.0"/>
+<!--
+     <BoundaryCondition  fieldname="Displacement" setnames="Zmax_Roof" component="0" scale="0.0" />
+     <BoundaryCondition  fieldname="Displacement" setnames="Zmax_Roof" component="1" scale="0.0" />
+     <BoundaryCondition  fieldname="Displacement" setnames="Zmax_Roof" component="2" scale="0.0" />
+-->
+
+  </BoundaryConditions>
+
+  <!-- INITIAL CONDITIONS -->
+  <InitialConditions>
+
+     <!--  <ConstantInitialCondition setnames="Fracture_Roof" fieldname="Velocity" fieldtype="Vector" object="Node" value="-0.01 0.0 0" />--> 
+
+    <ConstantInitialCondition setnames="Fracture_Floor" fieldname="Mass" object="Node" value="1.0" />
+    <ConstantInitialCondition setnames="Fracture_Roof" fieldname="Mass" object="Node" value="1.0" />
+    <ConstantInitialCondition setnames="Fracture_Floor" fieldname="Floor" object="Face" value="1.0" />
+    <ConstantInitialCondition setnames="Zmax_Floor" fieldname="FlowSurface" object="Face" value="1.0" />
+
+
+    <ConstantInitialCondition setnames="Fracture_Floor" fieldname="Floor" object="Node" value="1.0" />
+
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Face" value="1.0" />
+
+   <!-- Shape surface and mesh elements -->  
+     <InitialConditionFunction fieldname="ZshiftFloor" fieldtype="Scalar" object="Node" 
+                              function="FloorFunc"
+                              variables="ReferencePosition"
+                              variableTypes="Vector" />
+     <InitialConditionFunction fieldname="ZshiftRoof" fieldtype="Scalar" object="Node" 
+                              function="RoofFunc"
+                              variables="ReferencePosition"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="ReferencePosition" fieldtype="Vector" component="2" object="Node" 
+                              function="surfaceFunction"
+                              variables="ReferencePosition ZshiftFloor ZshiftRoof"
+                              variableTypes="Vector Scalar Scalar" /> 
+
+    <!-- Aperture -->
+    <CalculateFaceCenters/>
+    <CalculateAperture/> 
+
+    <InitialConditionFunction fieldname="ZshiftFloor" fieldtype="Scalar" object="Face" 
+                              function="FloorFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="ZshiftRoof" fieldtype="Scalar" object="Face" 
+                              function="RoofFunc"
+                              variables="FaceCenter"
+                              variableTypes="Vector" />
+
+    <InitialConditionFunction fieldname="verticalAperture" fieldtype="Scalar" object="Face" 
+                              function="vertFunc"
+                              variables="ZshiftFloor ZshiftRoof" />
+
+  </InitialConditions>
+
+  <!-- TABLES -->
+  <Tables>
+    <Table1D name="tractionTable" 
+             coord = "0.0, 10us, 1year"
+             value = "0.0, 1.0 , 1.0" />
+    <Table2D name="FloorTable" value_file="SurfaceData/Ohaaki/Floor_values.txt" x_file="SurfaceData/Ohaaki/Floor_x_ticks.txt" y_file="SurfaceData/Ohaaki/Floor_y_ticks.txt" 
+	     x_units="cm" y_units="cm" value_units="mm"/>
+    <Table2D name="RoofTable" value_file="SurfaceData/Ohaaki/RoofB_values.txt" x_file="SurfaceData/Ohaaki/Roof_x_ticks.txt" y_file="SurfaceData/Ohaaki/Roof_y_ticks.txt" 
+	     x_units="cm" y_units="cm" value_units="mm"/>
+
+  </Tables>
+
+  <!-- FUNCTIONS -->
+  <Functions>
+
+     <SymbolicFunction name="surfaceFunction"
+                      constants="zWidth 0.2cm, zSep 1.0cm"
+                      f="z+ if(z<0.5*zSep,dzFloor*(1-abs(z)/zWidth),dzRoof*(1-abs(z-zSep)/zWidth)-zSep)"
+                      variables ="x,y,z,dzFloor,dzRoof" /> 
+
+   <!--   <SymbolicFunction name="surfaceFunction"
+                      constants="zWidth 0.2cm, zSep 1.0cm"
+                      f="z+ if(z<0.5*zSep,0.0,-zSep+0.0001)"
+                      variables ="x,y,z,dzFloor,dzRoof" />-->
+
+    <SymbolicFunction name="vertFunc"
+                      f="y-x"
+                      variables ="x,y" /> 
+
+
+    <Lookup2DTable name="RoofFunc" table="RoofTable" />
+    <Lookup2DTable name="FloorFunc" table="FloorTable" />
+
+  </Functions>
+
+  <!-- needed to calculate aperture -->
+  <Contact cosMinTol="0.7" active="1" >
+    <PenaltyCoulombJoint stressSoften="20.0" stressYield="15.0"  normalApproachYield="0.009999" aperture="0.01"/>
+  </Contact>
+
+  <ElementRegions>
+    <ElementRegion name="Fracture_Floor" hgStiff="0.01" elementtype="uniformstrain" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="12 GPa" Density="2650 kg/m^3" BulkModulus="12 GPa"/>
+    </ElementRegion>
+    <ElementRegion name="Fracture_Roof" hgStiff="0.01" elementtype="uniformstrain" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="12 GPa" Density="2650 kg/m^3" BulkModulus="12 GPa"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <Output plot_interval="0.079 us" plotfile_root="/p/lscratchd/walsh24/Wellbore/Simulations/deformTwoSurface" writeFEMEdges="1" writeFEMFaces="1"/>
+</Problem>

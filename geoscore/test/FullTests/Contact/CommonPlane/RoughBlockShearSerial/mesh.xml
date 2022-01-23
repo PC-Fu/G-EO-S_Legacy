@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <Contact active="1"  cosMinTol="0.6" penetrationTol="0.25">
+    <PenaltyCoulombJoint stressSoften="20" stressYield="15" aperture="0.01" arealStiffnessShear="15" frictionCoefficient="0.3" normalApproachYield="0.009999"/>
+  </Contact>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1e-2" dt="1.0e-6">
+      <Apply solver="solver1" toregions="EB1 EB2"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" elementtype="uniformstrain">
+        <LinearElasticMaterial/>
+    </ElementRegion>
+    <ElementRegion name="EB2" elementtype="uniformstrain">
+        <LinearElasticMaterial/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+        <BoundaryCondition      fieldname="Velocity" 
+                            setnames="NS1" 
+                            component="0" 
+                            scale="0.1"
+                            timetable="tv" />
+
+        <BoundaryCondition      fieldname="Velocity" 
+                            setnames="NS2" 
+                            component="0" 
+                            scale="0.0"
+                            timetable="tv" />
+
+
+        <!-- F = sigma*A, A=1e-2k-->
+        <!--
+        <BoundaryCondition      fieldname="Force"
+                            setnames="NS1"
+                            component="2" 
+                            scale="-100"
+                            timetable="ts" />
+
+        <BoundaryCondition      fieldname="Force"
+                            setnames="NS2"
+                            component="2" 
+                            scale="100"
+                            timetable="ts" />
+        -->
+
+
+        <BoundaryCondition      fieldname="Velocity"
+                            setnames="NS1"
+                            component="2" 
+                            scale="-1.0"
+                            timetable="tv1" />
+
+        <BoundaryCondition      fieldname="Velocity"
+                            setnames="NS2"
+                            component="2" 
+                            scale="1.0"
+                            timetable="tv1" />
+
+
+
+  </BoundaryConditions>
+
+  <!--<InitialConditions>
+    <ConstantInitialCondition setnames="block1" fieldname="Velocity" fieldtype="Vector" object="Node" value="-1.0 -0.0 0" />
+    <ConstantInitialCondition setnames="block2" fieldname="Velocity" fieldtype="Vector" object="Node" value="1.0 0.0 0" />
+  </InitialConditions>-->
+
+  <Tables>
+    <Table1D name="tv"
+               coord  = "0.0 0.001  1.0e9"
+               value = "0.0    1.0    1.0" />
+    <Table1D name="tv1"
+               coord  = "0.0 0.001  1.0e9"
+               value = "1.0    0.0    0.0" />
+    <Table1D name="ts"
+               coord  = "0.0 0.00001  1.0e9"
+               value = "1.0    1.0    1.0" />
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="2" ypar="2" zpar="1" />
+  </Partition>
+    
+  <Output  plot_interval="1.0e-4" plotfile_root="output" parallel_silo="1"/>
+
+</Problem>

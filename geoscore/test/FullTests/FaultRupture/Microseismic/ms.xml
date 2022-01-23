@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units default_units="SI_Units" />
+
+  <Mesh file="testblock.geom" units="m"/>
+
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+    <MicroseismicSourceSolver name="solver2" criticalStateLimit="5e2" M0_Mtotal_ratio="0.001"
+			      meanCohesion="1e2" stdevCohesion="3e1" minCohesion="1e1" maxCohesion="1e3"
+			      minA="0.011" maxA="0.013" tocTableName="toc"
+			      minNormalRelease="1e-3" maxNormalRelease="3e-3">
+      <JointSets elementRegionName="PM1">
+	<JointSet weight="1.0" seed="213671"
+		  minStrikeDimension="0.1" maxStrikeDimension="0.6" exponentStrikeDimension="-2.5"
+		  meanAspectRatio="0.5" stdevAspectRatio="0.2" minAspectRatio="0.1" maxAspectRatio="0.9"
+		  meanStrikeAngle="90" stdevStrikeAngle="9" minStrikeAngle="56" maxStrikeAngle="132"
+		  meanDipAngle="70" stdevDipAngle="15" minDipAngle="45" maxDipAngle="90"
+		  meanFrequency="160" stdevFrequency="60" maxFrequency="300"/>
+      </JointSets>
+    </MicroseismicSourceSolver>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1e-3" dt="1.0e-6">
+      <Apply solver="solver1" toregions="PM1"/>
+      <Apply solver="solver2" toregions="PM1"/>
+    </Application>
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="PM1" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15e9" Density="2650" BulkModulus="15e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition      fieldname="Velocity" 
+                            setnames="xneg" 
+                            direction="0.0 1.0 0.0" 
+                            scale="-4.0e-1"
+			    object="Node"
+                            timetable="ttable" />
+    <BoundaryCondition      fieldname="Velocity" 
+                            setnames="xpos" 
+                            direction="0.0 1.0 0.0" 
+                            scale="4.0e-1"
+			    object="Node"
+                            timetable="ttable" />
+  </BoundaryConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord = "0.0, 1.0e9"
+               value = "1.0,  1.0" />
+    <Table3D name="toc" x_file="x" y_file="y" z_file="z" voxel_file="toc"/>
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="1" plot_interval="5e-5" restart_interval="5e-4" plotfile_root="ms" parallel_silo="1"/>
+
+</Problem>
+

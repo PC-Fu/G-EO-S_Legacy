@@ -1,0 +1,123 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units default_units="SI_Units" />
+
+  <Mesh xcoords="-20 20"
+        ycoords="-20 20"
+        zcoords="-20 20"
+        nx="8"
+        ny="8"
+        nz="8"
+        elementType="C3D8"
+        regionNames="Region"
+	perturbationSeed="0"
+        />
+
+  <Solvers>
+    <Hydrofracture name="solver1"
+                   timeIntegration="Explicit"
+                   ppSolverName="ppsolve"
+                   lgSolverName="lagsolve"
+                   normalJointStiffness="2e8"/>
+
+    <LagrangeLargeStrain name="lagsolve"
+                         courant="0.8"
+                         timeIntegrationOption="2"
+                         dampingM="1000"/>
+
+    <ParallelPlateFlowSolver name="ppsolve"
+                             ppcourant="0.375"
+                             BulkModulus="1e7"
+                             pressurecap="3e6"
+                             BartonJointParameters="0.5e-3 5e6 0.1e-3"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2">
+      <Apply solver="solver1" toregions="Region"/>
+    </Application>
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" elementtype="poly">
+        <LinearElasticMaterial ShearModulus="12 GPa" Density="1e6" BulkModulus="20 GPa"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <Nodesets>
+    <Nodeset name="source" 
+	     type="0" 
+	     xmin="-6 -12 -6"
+	     xmax="6 -8  6" />
+    <Nodeset name="source" 
+	     type="0" 
+	     xmin="-6 8 -6"
+	     xmax="6 12 6" />
+    <Nodeset name="PreFrac" 
+	     type="0" 
+	     xmin="-11 -12 -11"
+	     xmax="11 -8  11" />
+    <Nodeset name="PreFrac"
+	     type="0" 
+	     xmin="-11 8 -11"
+	     xmax="11 12 11" />
+    <Nodeset name="Splitable" 
+	     type="0" 
+	     xmin="-800 -12 -800"
+	     xmax="800 -8  800" />
+    <Nodeset name="Splitable" 
+	     type="0" 
+	     xmin="-800 8 -800"
+	     xmax="800 12 800" />
+  </Nodesets>
+
+  <BoundaryConditions>
+     <PerforatedCasedWellboreBoundaryCondition
+                            scale="0.2"
+			    axialLength="2000.0"
+			    origin="0 -1000 0"
+			    axis="0 1 0"
+			    radius="0.08"
+			    bulkModulus="1 GPa"
+			    referenceDensity="1000"
+			    pressureCap="0.1 GPa"
+			    pipeFriction="0.1"
+			    perforationChannelFriction="0.1"
+			    casingThickness="0.01"
+			    perforationDiameter="0.015"
+			    perforationCountPerCluster="12"
+			    setnamesHydro="source"
+                            timetable="ttable" />
+  </BoundaryConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord="0.0, 1.0e9"
+               value="1.0,  1.0" />
+    <Table1D name="intervaltable" 
+	       coord="0, 300" 
+	       value="30, 200" />
+  </Tables>
+    
+  <Fracture fractureFlag="1"
+            preFractureSetName="PreFrac"
+            separableSet="Splitable"
+            rockToughness="1e5"
+            failCriterion="1"
+            failgap="0.0004"
+	    maxTurnAngle="45"
+	    />
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1"/>
+  </Partition>
+
+  <!-- orig restart interval 12-->
+  <Output  writePlot="0" writeRestart="1"
+           restart_interval="1" plot_interval="1" plotfile_root="plot" parallel_silo="1"
+           slave_directory="sub" writeFEMFaces="1" writeFEMEdges="1"
+           fieldsToPlot="CommonHydroFrac"/>
+</Problem>

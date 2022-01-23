@@ -1,0 +1,187 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Parameter DissolutionRate="0.003" />
+  <Parameter MM="1" CM="10" M="1000"
+             S="1" MIN="60*$:S" HOUR="60*$:MIN" DAY="24*$:HOUR"
+             G="1" KG="1000" 
+             MOL="1" MMOL = "0.001"
+             L = "1000*$:CM^3" 
+             N = "$:KG*$:M/$:S^2"/>
+
+  <Solvers>
+      <SteadyStateParallelPlateFlowSolver name="pvSolver"
+                                          tol="0.0001" 
+                                          doDataWrite="0"
+                                          flowRegions="fracture1"
+                                          nonFlowFaces="Zmin Zmax" 
+                                          MaximumAperture = "`0.004*$:M^2`" 
+                                          mu = "`3.0e-4*$:N*$:S/$:M^2`"/> 
+   
+      <SteadyStateADRSolver name="ssSolver" 
+                            adrSolver="adrSolver"
+                            tol="0.01" 
+                            speciesList="Ca"
+                            diffusiveLengthScale="1">
+          <ReactionRateFunctions>
+             <ReactionRateFunction species="Ca" 
+                                   function="CaReactionRateFunction" 
+                                   variables="Ca"/>
+          </ReactionRateFunctions>
+      </SteadyStateADRSolver>
+
+      <ADRSolver name="adrSolver" 
+                 tol="0.001" 
+                 doDataWrite="0"
+                 interpolateVelocity="0"
+                 interpolatePorosity="1"/>
+   
+      <DisSolver name="dissolverUpper"
+                 function="dissolutionRateFunction"
+                 variables="Ca"
+                 faceSet = "Zmax"/>
+  </Solvers>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="100.0" dt="1.0">
+
+      <Apply solver="pvSolver" toregions="fracture1"/> 
+      <Apply solver="dissolverUpper" toregions="fracture1"/> 
+      <Apply solver="ssSolver" toregions="fracture1"/> 
+
+    </Application>  
+  </SolverApplications>
+
+
+  <ElementRegions>
+  </ElementRegions>
+
+
+  <BoundaryConditions>
+
+  <!-- SS Parallel Plate Flow Solver pressure boundary conditions -->
+    <BoundaryCondition     object="Face"
+                           fieldname="Pressure" 
+                           setnames="Ymin"
+                           component="0" 
+                           scale="1.01" />
+    <BoundaryCondition     object="Face"
+                           fieldname="Pressure" 
+                           setnames="Ymax"
+                           component="0" 
+                           scale="0.99" />
+
+
+  <!-- ADR boundary condtitions -->
+    <!-- UpStream BC -->
+    <BoundaryCondition      fieldname="Ca" 
+                            setnames="Ymin" 
+                            component="0" 
+                            timetable="ttable"
+                            scale="`1.0*$:MMOL`" />
+
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Ymin" 
+                            component="0" 
+                            scale="0.0" />
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Ymin" 
+                            component="2" 
+                            scale="0.0" />
+
+    <!-- Downstream BC -->
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Ymax" 
+                            component="1" 
+                            scale="0.0" />
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Ymax" 
+                            component="0" 
+                            scale="0.0" />
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Ymax" 
+                            component="2" 
+                            scale="0.0" />
+
+    <!-- X axis BC -->
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Xmax" 
+                            component="0" 
+                            scale="0.0" />
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Xmin" 
+                            component="0" 
+                            scale="0.0" />
+
+    <!-- Z axis BC -->
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Zmax" 
+                            component="2" 
+                            scale="0.0" />
+    <BoundaryCondition      fieldname="ConcentrationFlux" 
+                            setnames="Zmin" 
+                            component="2" 
+                            scale="0.0" />
+  </BoundaryConditions>
+
+
+  <InitialConditions>
+    <ConstantInitialCondition fieldname="Ca" 
+                              fieldtype="Scalar"  
+                              object="Node"
+                              value="0" />
+    <ConstantInitialCondition fieldname="ConcentrationFlux" 
+                              fieldtype="Vector"  
+                              object="Node"
+                              value="0 0 0"/>
+    <!--<ConstantInitialCondition fieldname="FluidVelocity"
+                              fieldtype="Vector" 
+                              object="Node" 
+                              value="0 0.1 0"/>-->
+    <ConstantInitialCondition fieldname="Porosity" 
+                              fieldtype="Scalar"  
+                              object="Node" 
+                              value="1"/>
+  </InitialConditions>
+
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0   100  1000"
+               value = "0.0   1.0   1.0" />
+  </Tables>
+
+  
+  <Functions>
+    <SymbolicFunction name="CaReactionRateFunction"
+                      f="k*(CaEq-Ca)"
+                      variables="Ca"
+                      constants="k 0.01, CaEq 0.0" />
+    <SymbolicFunction name="CaReactionRateB"
+                      f="k*(CaEq-Ca)"
+                      variables="Ca"
+                      constants="k 0.01, CaEq 1.0" />
+    <SymbolicFunction name="HCO3ReactionRateFunction"
+                      f="k*(HCOEq-HCO)"
+                      variables="HCO"
+                      constants="k 0.01, HCOEq 0.01" />
+    <SymbolicFunction name="dissolutionRateFunction"
+                      f="k*(CaEq-Ca)*MM_CaCO3/rho_CaCO3"
+                      constants="k 0.01, CaEq 0.0, MM_CaCO3 40.08, rho_CaCO3 2.71"
+                      variables ="Ca" />
+                      <!-- 
+                           MM_CaCO3  = 40.08 G/MOL (Molar mass, calcium carbonate)
+                           rho_CaCO3 = 2.71 G/CM^3 (Density calcium carbonate)
+                       -->
+    <ConstantFunction name="dissolverTestA" f="0.001" />
+
+    <SymbolicFunction name="dissolverTestB"
+                      f="k*exp(y/10)"
+                      constants="k `0.5*$:DissolutionRate`"
+                      variables ="x,y,z" />
+  </Functions>
+
+  <Output plot_interval="1.0">
+  </Output>
+</Problem>

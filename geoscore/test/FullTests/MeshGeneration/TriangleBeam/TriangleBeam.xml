@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!-- 
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+
+<Parameters>
+  <Parameter name="SolidDensity"      value="2650 kg/m^3" />
+  <Parameter name="SolidBulkModulus"  value="8.33333 MPa" />
+  <Parameter name="SolidShearModulus" value="3.84615 MPa" />
+  <Parameter name="deltaTime"         value="0.005 s" />
+  <Parameter name="endTime"           value="0.01 s"/>
+</Parameters>
+
+  <Mesh 
+    xcoords="0 50 150"
+    ycoords="-11 -6 6"
+	nx="50 10"
+	ny="3 12"
+	elementType="STRI"
+	regionNames="RegionA RegionB RegionC RegionD"
+	/>
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-16"
+				    useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="RegionA RegionB RegionC RegionD"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="RegionA" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+    <ElementRegion name="RegionB" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+    <ElementRegion name="RegionC" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+    <ElementRegion name="RegionD" elementtype="linear" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="xpos" 
+	                     direction="0.0 -1 0.0" 
+			     scale="1000 Pa"
+			     timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="1" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 10.0"
+           value = "0.0, 1.0" />
+</Tables>
+
+
+
+<Partition>
+  <SpatialPartition xpar="1" ypar="1" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" restart_interval="1.0" plotfile_root="plot" parallel_silo="1"/>
+
+</Problem>

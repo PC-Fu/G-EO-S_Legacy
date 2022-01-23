@@ -1,0 +1,5 @@
+
+source("../../gpac.ats")
+gpac = get('gpac')
+
+stick(level=400)

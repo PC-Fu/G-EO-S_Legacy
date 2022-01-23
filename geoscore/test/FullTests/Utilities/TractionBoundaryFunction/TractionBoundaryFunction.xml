@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<!-- A solid body subjected to traction on surface with spatially varying magnitude.-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-16"
+				    useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <Mesh 
+    xcoords="-10 10"
+    ycoords="0 10"
+    nx="20"
+    ny="10"
+    elementTypes="CPE4"
+    regionNames="Region" />
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="1e6"  Density="3000" BulkModulus="1e6" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+<BoundaryConditions>
+   <TractionBoundaryConditionFunction  object="Face" setnames="ypos" 
+                                     function="tractable" 
+                                     variables="FaceCenter"
+                                     variableTypes="Vector"  
+			             direction="0 -1 0" />
+
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+
+<InitialConditions>
+  <CalculateFaceCenters/>
+<!-- This directive tells GEOS to calculate and locations of face centers in the initialization phase and stores it in a R1Tensor field called "FaceCenter".  This information is needed by the function called by the function-based traction boundary condition.
+-->
+</InitialConditions>
+
+<Tables>
+    <Table3D name="tractable" x_file="x" y_file="y" z_file="z" voxel_file="traction"/>
+<!-- Table manager automatically creates a function for each table under the same name.
+The corresponding function of a 3D table will take a vector (x,y,z) as input and return the value based on interpolation in the table.
+-->
+
+</Tables>
+
+<Partition>
+  <SpatialPartition xpar="2" ypar="2" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" writeRestart="1" restart_interval="1.0" plot_interval="1.0" plotfile_root="plot" parallel_silo="1"/>
+
+</Problem>

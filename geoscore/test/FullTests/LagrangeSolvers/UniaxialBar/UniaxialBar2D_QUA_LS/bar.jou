@@ -1,0 +1,21 @@
+reset
+create surface rectangle width 100 height 1 zplane 
+
+curve 1 3 size .1
+curve 1 3 scheme equal
+curve 4 2 size 1
+
+mesh surface 1
+nodeset 1 curve 2  
+nodeset 2 curve 4  
+nodeset 3 curve 3  
+nodeset 4 curve 1  
+
+set duplicate block elements off
+block 1 surface all 
+set Abaqus precision 6
+export Abaqus "/Users/settgast1/GEOS/trunk/test/full_tests/explicit_lagrange/bar2d/bar.geom" Block all Nodeset all dimension 3 overwrite cubitids 
+
+
+
+

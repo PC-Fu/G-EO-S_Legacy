@@ -1,0 +1,87 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+  <Mesh 
+        externalMeshFile="0"
+	xcoords="-1   1"
+	ycoords="-1   1"
+        zcoords="-1   1"
+	nx="3"
+	ny="3"
+	nz="2"
+	elementType="C3D4"        
+	regionNames="Region"
+	/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />  
+
+  <Nodesets>
+     <Nodeset name="prefrac" 
+	     type="0" 
+	     xmin=" -1 -1 -0.01"
+	     xmax="  1  1  0.01" />
+  </Nodesets>
+
+  <Contact active="1"
+           penetrationTol="1e-05"
+           maximumSeparation="1e-06"
+           ImplicitActive="1"
+	   ThreeDTrue="1"
+	   NitscheFlag="1"
+	   NitscheTau2Flag="1"
+	   NitscheTau1Flag="1"
+           slidingLaw="2"
+           FrictionCoefficient="0.1"
+           TractionCutoff="0.1">
+  <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+  <Solvers>
+    <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                        tol="1e-12"
+				        useMLPreconditioner="1"
+					useDirectSolver="1"
+       			                useNewtonSolve="1"
+					tolNewton="1e-10"/>
+  </Solvers>
+
+
+  <Fracture fractureFlag="1" 
+	    preFractureSetName="prefrac" 
+            failgap="1e-09"
+            failstress="1e20"/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10" dt="1">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="linear" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="384.6153846153846153" Density="1" BulkModulus="833.333333333333"/> 
+    </ElementRegion>
+  </ElementRegions>
+
+ <BoundaryConditions>
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="0" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="1" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="2" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="2" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="0" scale="0.1" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="1" scale="0.1" fieldtype="Vector" timetable="tv1" />
+ </BoundaryConditions>
+
+  
+  <Tables>
+    <Table1D name="tv1"
+               coord = "0.0,    5.0, 10.0"
+               value = "0.0,    1.0,  0.0" />
+  </Tables>
+
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="0" writeRestart="1" restart_interval="5" plot_interval="1" plotfile_root="FricSlidTest" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

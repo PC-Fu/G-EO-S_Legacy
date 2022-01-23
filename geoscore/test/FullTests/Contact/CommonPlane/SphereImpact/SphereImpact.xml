@@ -1,0 +1,103 @@
+<?xml version="1.0" ?>
+
+<!--# {\bf{Problem composed by R. Settgast. Comment by E. Herbold 12/22/11}} \\
+  This problem simply tests the impact of two symmetric sphere meshes.
+  The material model is elastic and the contact method and stability 
+  is tested with this problem.  For this problem an analytical solution
+  exists for the contact time (from Landau and Lifschitz Elasticity book):
+  \begin{equation}
+  t_{c} = 2.94\left(\frac{5}{8A} \right)^{2/5}v_{0}^{-1/5}
+  \end{equation}
+  where $v_{0}$ is the initial (combined) impact velocity (in this case 200 m/s)
+  and A is given by 
+  \begin{equation}
+  A = \frac{4E_{1}E_{2}\sqrt{R_{1}R_{2}/(R_{1}+R_{2})}}{3m\left[E_{2}(1-\nu_{1}^{2})+E_{1}(1-\nu_{2}^{2}) \right]}
+  \end{equation}
+  In this problem, $E_{1}=E_{2}=33.75$ GPa, $\nu_{1}=\nu_{2}=0.125$, $R_{1}=R_{2}=0.15$ mm. 
+  The contact time is computed as $t_{c}=0.434 \mu$s.  One has to be careful about units when
+  computing the collision time.  Also, the density used in this problem was $\rho=2.65$g/cc 
+  which can be used to compute the mass.
+#-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Mesh file="tgSphere6.geom"/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.1" timeIntegrationOption="2"/>
+  </Solvers>
+  <Contact active="1" >
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="9.999e-3" aperture="1.0e-2" />
+  </Contact>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="0.3 us">
+      <Apply solver="solver1" toregions="PM1 PM2"/>
+    </Application>  
+  </SolverApplications>
+
+  <!-- nu = 0.125; E = 2.25 * 15 = 33.75 -->
+  <!-- Contact time = tc = 3.6 microseconds -->
+  <ElementRegions>
+    <ElementRegion name="PM1" hgStiff="0.01" elementtype="uniformstrain"  hgDamp="0.0">
+        <LinearElasticMaterial ShearModulus="15" Density="2.65" BulkModulus="15"/>
+    </ElementRegion>
+    <ElementRegion name="PM2" hgStiff="0.01" elementtype="uniformstrain"  hgDamp="0.0">
+        <LinearElasticMaterial ShearModulus="15" Density="2.65" BulkModulus="15"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <InitialConditions>
+    <ConstantInitialCondition setnames="ns1" fieldname="Velocity" 
+			      fieldtype="Vector" object="Node" value="0.1 0.0 0" />
+    <ConstantInitialCondition setnames="ns2" fieldname="Velocity" 
+			      fieldtype="Vector" object="Node" value="-0.1 0.0 0" />
+  </InitialConditions>
+
+
+  <BoundaryConditions>
+
+<!--
+    <RigidWallBoundaryCondition setnames="NS1" 
+				direction="-1 0 0" 
+				wallcoord="0 0 0" />
+
+    <RigidWallBoundaryCondition setnames="NS2" 
+				direction="1 0 0" 
+				wallcoord="0 0 0" />
+
+
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="ns1"
+                            component="1" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="ns2"
+                            component="1" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="ns1"
+                            component="2" 
+                            scale="0.0" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="ns2"
+                            component="2" 
+                            scale="0.0" />
+-->
+  </BoundaryConditions>
+
+
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  plot_interval="1" restart_interval="0.3" parallel_silo="1" writeFEMFaces="1" plotfile_root="sphereimpact" trackEnergy="100" />
+
+</Problem>
+

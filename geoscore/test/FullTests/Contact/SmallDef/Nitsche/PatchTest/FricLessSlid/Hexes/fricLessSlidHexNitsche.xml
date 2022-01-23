@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+
+<!-- Patch test: small deformation contact enforced using penalty method -->
+<!-- 		 Crack face oriented along X                             -->
+<!--             Exact solution expected: u_y = y; u_x = 0;              -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+  <Mesh 
+        externalMeshFile="0"
+	xcoords="-1  1"
+	ycoords="-1  1"
+	zcoords="-1  1"
+	nx="1"
+	ny="1"
+	nz="2"
+	elementType="C3D8"
+	regionNames="Region"
+	/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+
+  <Nodesets>
+     <Nodeset name="prefrac" 
+	     type="0" 
+	     xmin=" -1 -1 -0.01"
+	     xmax="  1  1  0.01" />
+    <Nodeset name="xneg2" 
+	     type="0" 
+	     xmin="-1.0001 -1.0001 -1.0001"
+	     xmax="-0.9999  1.0001 -0.9999" />
+    <Nodeset name="xpos2" 
+	     type="0" 
+	     xmin=" 0.9999 -1.0001 -1.0001"
+	     xmax=" 1.0001  1.0001 -0.9999" />
+    <Nodeset name="yneg2" 
+	     type="0" 
+	     xmin="-1.0001 -1.0001 -1.0001"
+	     xmax=" 1.0001 -0.9999 -0.9999" />
+    <Nodeset name="ypos2" 
+	     type="0" 
+	     xmin="-1.0001  0.9999 -1.0001"
+	     xmax=" 1.0001  1.0001 -0.9999" />
+  </Nodesets>
+
+  <Contact active="1"
+           penetrationTol="1e-05"
+           maximumSeparation="1e-06"
+           ImplicitActive="1"
+	   ThreeDTrue="1"
+	   NitscheFlag="1"
+	   NitscheWeightedFlag="1"
+           NitscheTau1Flag="0"
+           NitscheTau2Flag="0">
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="5e-3" />
+  </Contact>
+
+  <Solvers>
+    <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-12"
+				    useDirectSolver="1"/>
+  </Solvers>
+
+
+  <Fracture fractureFlag="1" 
+	    preFractureSetName="prefrac" 
+            failgap="0.0004"
+	    failstress="1e20"/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1" dt="1">
+      <Apply solver="implag2d" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="poly" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="0.5" Density="1" BulkModulus="0.333333333333333"/> <!-- Should specify the normal and tangential penalty parameter here -->
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="2" scale="0.025" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg2" component="0" scale="-0.0075" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xpos2" component="0" scale="0.0075" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg2" component="1" scale="-0.0075" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos2" component="1" scale="0.0075" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="2" scale="-0.025" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="1" scale="0.0" fieldtype="Vector" timetable="tv1" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="0" scale="0.0" fieldtype="Vector" timetable="tv1" />
+  </BoundaryConditions>
+
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="Lame" tablename="Lame" toregion="Region"/>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="ShearModulus" tablename="ShearModulus" toregion="Region"/>
+  </InitialConstitutiveValues>
+  
+  <Tables>
+    <Table1D name="tv1"
+               coord = "0.0,  1.0"
+               value = "1.0,  1.0" />
+    <Table3D name="Lame" x_file="x" y_file="y" z_file="z" voxel_file="Lame"/>
+    <Table3D name="ShearModulus" x_file="x" y_file="y" z_file="z" voxel_file="ShearModulus"/>
+  </Tables>
+
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output writePlot="0" plot_interval="1" restart_interval="1" plotfile_root="tangent" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

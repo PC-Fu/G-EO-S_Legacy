@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Mesh de_file="blockoffcenter.geom"/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <ElementRegions>
+    <ElementRegion name="PM1" hgStiff="0.01" elementtype="uniformstrain"  hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="29.92" Density="2.65" BulkModulus="43.45"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1" dt="1e-3">
+      <Apply solver="solver1" toregions="PM1"/>
+    </Application>  
+  </SolverApplications>
+
+  <Contact active="1"  cosMinTol="0.6" penetrationTol="0.25">
+    <PenaltyCoulomb stressSoften="20" stressYield="15" aperture="0.005" arealStiffnessShear="15" frictionCoefficient="0.0" normalApproachYield="0.0049999"/>
+  </Contact>
+
+  <InitialConditions>
+    <ConstantInitialCondition setnames="de0" 
+			      fieldname="Velocity" 
+			      fieldtype="Vector" 
+			      object="DiscreteElement" 
+			      value="1e-3 1e-3 0" />
+  </InitialConditions>
+    
+  <Partition>
+    <SpatialPartition xpar="2" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="0" restart_interval="0.5" plot_interval="0.01" plotfile_root="icblock" parallel_silo="1"/>
+
+</Problem>

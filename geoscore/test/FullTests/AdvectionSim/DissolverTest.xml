@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Parameter kappa="0.003" />
+
+  <Solvers>
+      
+      <DisSolver name="dissolverUpper"
+                 function="dissolverTest"
+                 variables="ReferencePosition"
+                 variableTypes="Vector"
+                 faceSet = "Zmax"/>
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="101.0" dt="1.0">
+
+      <Apply solver="dissolverUpper" toregions="fracture1"/> 
+
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+  </ElementRegions>
+
+
+  <Functions>
+    <SymbolicFunction name="dissolverTest"
+                      f="k*exp(y/10)"
+                      constants="k $:kappa"
+                      variables ="x,y,z" />
+  </Functions>
+
+  <Output plot_interval="10.0" plotfile_root="test_dissolver"/>
+</Problem>

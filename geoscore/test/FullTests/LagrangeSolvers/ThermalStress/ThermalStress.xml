@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<!--
+Notes by Pengcheng Fu
+A elliptical cold inclusion in a nearly infinite domain.
+According to the solution in Mindlin R, Cooper H (1950) Thermoelastic stress around a cylindrical inclusion of elliptic cross-section. J Appl Mech ASME 17:265–268.
+the thermal stress inside the cold inclusion should be uniform.
+Under the plane strain condition, the value is
+sigma_xx = a E dT CTE / (a+b) / (1-miu)
+a and b is the ellipse's axis lengths; CTE is the volumetric coefficient of thermal expansion; they are 6 and 14 in this example.  
+
+According to the solution, the horizonal stress is
+
+sigma_xx = 6 x 5e9 x 100 x 0.5e-5 / 20 / 0.75 = 1E6
+sigma_yy = 1e6 / 6 * 14 = 2.33e6
+
+Unfortunately the temperature inside the inclusion in this simulation is not uniform because of imperfections in table value interpolation.
+-->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-16"
+				    useMLPreconditioner="0"
+				    referenceTemperature="0.0"
+				    thermalRegionNames="EB1"
+				    />
+</Solvers>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0" dt="1.0">
+      <Apply solver="implag2d" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="2e9"  Density="2500" BulkModulus="3.33333333e9" />
+    </ElementRegion>
+  </ElementRegions>
+  
+<!--#   <Mesh 
+    xcoords="-100 -12 12 100"
+    ycoords="-100 -24 24 100"
+    zcoords="-1 1"
+	nx="12 24 12"
+	ny="12 48 12"
+	nz="1"
+	elementTypes="C3D8"
+	regionNames="Region"
+	/>
+
+ #-->
+ 
+<Mesh file="Ellipse3D.inp" />
+   
+<Nodesets>
+        <Nodeset name="xnegyneg"         type="0" xmin="-100.1 -100.1 -100" xmax="-99.9 -99.9 100"/>
+        <Nodeset name="xnegypos"         type="0" xmin="-100.1  99.9  -100" xmax="-99.9 100.1 100"/>
+        <Nodeset name="xposypos"         type="0" xmin="  99.9  99.9  -100" xmax="100.1 100.1 100"/>
+        <Nodeset name="xnegyneg"         type="0" xmin="-100.1 -100.1 -100" xmax="-99.9 -99.9 100"/>
+        <Nodeset name="xneg"         type="0" xmin="-100.1 -100.1 -100" xmax="-99.9 100.1 100"/>
+        <Nodeset name="yneg"         type="0" xmin="-100.1 -100.1 -100" xmax="100.1 -99.9 100"/>
+        <Nodeset name="zneg"         type="0" xmin="-100.1 -100.1 -0.01" xmax="100.1 100.1 0.01"/>
+        <Nodeset name="zpos"         type="0" xmin="-100.1 -100.1 0.99" xmax="100.1 100.1 1.01"/>
+</Nodesets>
+
+<BoundaryConditions>
+
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zneg" component="2" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="zpos" component="2" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+  <InitialConditions>
+  <ConstantInitialCondition toregions="EB1" fieldname="linearCTE" fieldtype="Scalar" object="Element" value="0.5e-5" />
+  <InitialConditionTable toregions="EB1" fieldname="temperature" fieldtype="Scalar" object="Element" table="T" />
+  </InitialConditions>
+
+<Tables>
+  <Table3D name="T" x_file="x" y_file="y" z_file="z" voxel_file="T"/>
+</Tables>
+
+
+<Partition>
+  <SpatialPartition xpar="2" ypar="3" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" writeRestart="1" restart_interval="1.0" plot_interval="1.0" plotfile_root="Pplot" parallel_silo="1"/>
+
+</Problem>
+
+
+

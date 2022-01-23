@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!-- This tests the common plane algorithm against with two simple 2x1 meshes brought into normal contact then sheared -->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Mesh file="mesh2x1.geom"/>
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <Contact active="1"  cosMinTol="0.9" penetrationTol="0.2">
+    <PenaltyCoulomb stressSoften="20" stressYield="15" aperture="0.01" arealStiffnessShear="15" frictionCoefficient="0.3" normalApproachYield="0.009999"/>
+  </Contact>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="6e2" dt="1">
+      <Apply solver="solver1" toregions="EB1 EB2"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" hgStiff="0.01" elementtype="uniformstrain" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="29.92" Density="2.65" BulkModulus="43.45"/>
+    </ElementRegion>
+    <ElementRegion name="EB2" hgStiff="0.01" elementtype="uniformstrain" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="29.92" Density="2.65" BulkModulus="43.45"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+	<!-- move block 1 in z then y -->
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity" 
+                            setnames="BLOCK1" 
+			    component="1"
+                            scale="-0.001"
+                            timetable="tv" />
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK1"
+                            component="2" 
+                            scale="-0.001"
+                            timetable="tv1" />
+
+	<!-- hold block 1 fixed in place in x -->
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK1"
+                            component="0"
+                            scale="0.0"
+                            timetable="tv2" />
+
+	<!-- hold block 2 fixed in place -->
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK2"
+                            component="0" 
+                            scale="0.0"
+                            timetable="tv2" />
+
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK2"
+                            component="1" 
+                            scale="0.0"
+                            timetable="tv2" />
+                            
+        <BoundaryCondition  object="Node"
+			    fieldname="Velocity"
+                            setnames="BLOCK2"
+                            component="2" 
+                            scale="0.0"
+                            timetable="tv2" />
+
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="tv"
+               coord = "0.0,  100, 1.0e9"
+               value = "0.0,  1.0,   1.0" />
+    <Table1D name="tv1"
+               coord = "0.0, 100,  1.0e9"
+               value = "1.0, 0.0,    0.0" />
+    <Table1D name="tv2"
+               coord = "0.0, 1.0e9"
+               value = "1.0, 1.0" />
+
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="0" restart_interval="3e2" plot_interval="12" plotfile_root="output" parallel_silo="1" writeFEMFaces="1"  />
+
+</Problem>

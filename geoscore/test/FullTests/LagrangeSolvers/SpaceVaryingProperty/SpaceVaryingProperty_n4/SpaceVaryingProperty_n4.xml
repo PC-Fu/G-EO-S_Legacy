@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<!-- 
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+
+<Parameters>
+  <Parameter name="SolidDensity"      value="2650 kg/m^3" />
+  <Parameter name="SolidBulkModulus"  value="8.33333 MPa" />
+  <Parameter name="SolidShearModulus" value="3.84615 MPa" />
+  <Parameter name="deltaTime"         value="0.005 s" />
+  <Parameter name="endTime"           value="0.01 s"/>
+</Parameters>
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2d" 
+                                    tol="1e-10"
+				    useMLPreconditioner="0"/>
+</Solvers>
+
+
+
+  <Mesh 
+    xcoords="-30 -10 10 30"
+    ycoords="-5 0 5"
+	nx="8 16 8"
+	ny="4 4 "
+	elementType="CPE4"
+	regionNames="RegionA RegionB RegionC RegionD RegionE RegionF"
+	/>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="RegionA RegionB RegionC RegionD RegionE RegionF"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="RegionA" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="1e7"  Density="2650"  BulkModulus="1e7" />
+    </ElementRegion>
+    <ElementRegion name="RegionB" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="2e7"  Density="2650"  BulkModulus="2e7" />
+    </ElementRegion>
+    <ElementRegion name="RegionC" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="2e7"  Density="2650"  BulkModulus="2e7" />
+    </ElementRegion>
+    <ElementRegion name="RegionD" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="1e7"  Density="2650"  BulkModulus="1e7" />
+    </ElementRegion>
+    <ElementRegion name="RegionE" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="1e7"  Density="2650"  BulkModulus="1e7" />
+    </ElementRegion>
+    <ElementRegion name="RegionF" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="2e7"  Density="2650"  BulkModulus="2e7" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="ShearModulus" tablename="G" toregion="RegionD"/>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="Lame" tablename="G" toregion="RegionD"/>
+  </InitialConstitutiveValues>
+  
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="xpos" 
+	                     direction="1.0 0 0.0" 
+			     scale="3.0 MPa"
+			     timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="xneg" component="1" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 2.0"
+           value = "0.0, 1.0" />
+    <Table3D name="G" x_file="x" y_file="y" z_file="z" voxel_file="G"/>
+</Tables>
+
+
+
+
+
+<Partition>
+  <SpatialPartition xpar="2" ypar="2" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" restart_interval="1.0" plot_interval="1.0" plotfile_root="plot" parallel_silo="1"/>
+
+</Problem>

@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<Problem>
+  <Include file="../single_element.xml"/>
+
+  <Solvers>
+  <LagrangeSmallStrainLinearElastic name="solver2" 
+                                    tol="1e-12"
+				    useMLPreconditioner="0"/>
+
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10.0" dt="1.0">
+      <Apply solver="solver2" toregions="Region"/>
+    </Application>  
+
+  </SolverApplications>
+
+  <Contact active="0">
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+  <BoundaryConditions>
+
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos" component="1" scale="0.02" fieldtype="Vector" timetable="ttable" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="-0.02" fieldtype="Vector" timetable="ttable" />
+
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="all" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Displacement" setnames="all" component="2" scale="0.0" fieldtype="Vector" />
+
+  </BoundaryConditions>
+
+  <Tables>
+    <Table1D name="ttable" 
+               coord = "0.0, 10.0, 1.0e9"
+               value = "0.0,  1.0, 1.0 " />
+  </Tables>
+
+  <Output  writePlot="0"
+	   plot_interval="1.0e-4" 
+	   restart_interval="5.0"
+	   plotfile_root="test" 
+	   writeFEMFaces="1" 
+	   writeFEMEdges="1" 
+	   parallel_silo="1" />
+</Problem>

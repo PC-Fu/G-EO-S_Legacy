@@ -1,0 +1,11 @@
+# Level 100 and below are always run
+# Level 200 and below are nightly
+# Level 300 and below are weekly
+# Level 400 must be run for release
+
+# set up default value of test option 'development'
+# this is for tests that aren't expected to pass
+glue(development=False)
+
+# the levels are defined locally
+source('LagrangeExplicit/LagrangeExplicit.ats')

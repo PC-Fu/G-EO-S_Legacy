@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Solvers>
+    <AdvectionLSFEMSolver name="solver1" tol="1e-5" />
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0">
+      <Apply solver="solver1" toregions="Name1" numberofsteps="100" />
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="p0" elementtype="Type1">
+        <LinearElasticMaterial materialtype="MType1">
+    </ElementRegion>
+    <StateVariable value="0.0"/>
+    <StateVariable name="t0" value="300.0"/>
+    </Region>
+  </ElementRegions>
+
+  <Output plot_interval="0.001">
+  </Output>
+</Problem>

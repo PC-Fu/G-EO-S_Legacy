@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!-- This is a 1d problem that tests wave propagation in a bar with reflection off of an interface and demonstrates basic conservation-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Mesh file="../cubemesh_200.inp" messagesize="9876"/>
+
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" 
+			 timeIntegrationOption="2"
+			 courant="0.5" />
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0"  endtime="1"  >
+      <Apply solver="solver1" toregions="EB1 EB2 EB3"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion abaqusID="C3D8" name="EB1" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15.0e9" Density="2650" BulkModulus="15.0e9"/>
+    </ElementRegion>
+    <ElementRegion abaqusID="C3D8" name="EB2" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15.0e9" Density="2650" BulkModulus="15.0e9"/>
+    </ElementRegion>
+    <ElementRegion abaqusID="C3D8" name="EB3" elementtype="uniformstrain">
+        <LinearElasticMaterial ShearModulus="15.0e9" Density="2650" BulkModulus="15.0e9"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <BoundaryConditions>
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="xneg" 
+                            component="0" 
+                            scale="0.01"
+                            timetable="ttable" />
+
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="yneg" 
+                            component="1" 
+                            scale="0.0" />
+
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="ypos" 
+                            component="1" 
+                            scale="0.0" />
+
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="zneg" 
+                            component="2" 
+                            scale="0.0" />
+
+    <BoundaryCondition      object="Node"
+			    fieldname="Velocity" 
+                            setnames="zpos" 
+                            component="2" 
+                            scale="0.0" />
+
+    
+  </BoundaryConditions>
+  <Tables>
+    <Table1D name="ttable" 
+               coord  = "0.0, 0.001, 0.002, 0.003, 1.0e9"
+               value = "0.0,    1.0,    1.0,  0.0,    0.0" />
+  </Tables>
+    
+  <Partition>
+    <SpatialPartition xpar="4" ypar="2" zpar="2" />
+  </Partition>
+    
+  <Output writePlot="0" plot_interval="1.00e-3" restart_interval="0.5" plotfile_root="output" parallel_silo="1"/>
+
+</Problem>

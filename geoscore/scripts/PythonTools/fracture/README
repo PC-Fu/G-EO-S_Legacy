@@ -1,0 +1,20 @@
+#
+# fracture
+#
+# Author:  Chris Sherman
+#
+
+This is a python module designed to process fracture data created in GEOS and create good looking plots.  To use this module, make sure it is visible on your default python search path (given by $PYTHONPATH).  The file ./examples.py contains a few examples of how to process the data in a given directory and create plots.  For instance:
+
+#/usr/bin/python
+import fracture
+
+fracture.process_dir_3D()
+
+-------------------------------------------------------------------------------------
+Prerequisites:
+Python 2.7.x
+NumPy
+Scipy v0.12.0 (or greater)
+
+Note: On LC, these are installed by default for 2.7.7 (/usr/apps/python2.7.7/bin/python)

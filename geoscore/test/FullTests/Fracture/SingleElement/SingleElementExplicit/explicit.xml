@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Include file="../single_element.xml"/>
+
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" 
+			 timeIntegrationOption="2"
+			 courant="0.5" />
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10.0">
+      <Apply solver="solver1" toregions="Region"/>
+    </Application>  
+
+  </SolverApplications>
+
+  <BoundaryConditions>
+
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="ypos" component="1" scale="0.002" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="yneg" component="1" scale="-0.002" fieldtype="Vector" />
+
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="2" scale="0.0" fieldtype="Vector" />
+
+  </BoundaryConditions>
+
+  <Output  writePlot="0"
+	   plot_interval="1.0" 
+	   restart_interval="5.0"
+	   plotfile_root="test" 
+	   writeFEMFaces="1" 
+	   writeFEMEdges="1" 
+	   parallel_silo="1" />
+</Problem>

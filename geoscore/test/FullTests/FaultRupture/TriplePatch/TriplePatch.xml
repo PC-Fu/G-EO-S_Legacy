@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Units default_units="SI_Units" />
+
+  <Mesh faultpatch_file="testfault.geom" units="m"/>
+
+  <Solvers>
+    <FaultRuptureBEMSolver name="solver1"
+             upVector="0 0 1" 
+             rakeVector="1 0 0" 
+             maximumHorizontalStressDirection="0 1 0"
+             dHdu="-20000" dhdu="0"
+             slipRateEQ="1" creepFrictionRate="0.001">
+      <Material ShearModulus="4.615e8" BulkModulus="1e9"/>
+	</FaultRuptureBEMSolver>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.5768e11">
+      <Apply solver="solver1" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <BoundaryConditions>
+    <BoundaryCondition  fieldname="shearRateDrive" 
+                        scale="3e-11"
+                        object="FaultElement"/>
+  </BoundaryConditions>
+  
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="frictionCoefficient" tablename="frictionCoefficient" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="currentFrictionCoefficient" tablename="currentFrictionCoefficient" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="A" tablename="A" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="B" tablename="B" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="Dc" tablename="Dc" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="alpha" tablename="alpha" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearRateStar" tablename="shearRateStar" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearSlipRateAB" tablename="shearSlipRateAB" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="stateStar" tablename="stateStar" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="frictionCoefficient" tablename="frictionCoefficient" toregion="EB1"/>
+    <InitialConstitutiveValue object="Fault_ElementManager" propertytype="shearRateDrive" tablename="shearRateDrive" toregion="EB1"/>
+  </InitialConstitutiveValues>
+  
+  <Tables>
+ 	<Table3D name="frictionCoefficient" x_file="x" y_file="y" z_file="z" voxel_file="frictionCoefficient"/>
+ 	<Table3D name="currentFrictionCoefficient" x_file="x" y_file="y" z_file="z" voxel_file="currentFrictionCoefficient"/>
+ 	<Table3D name="A" x_file="x" y_file="y" z_file="z" voxel_file="A"/>
+ 	<Table3D name="B" x_file="x" y_file="y" z_file="z" voxel_file="B"/>
+ 	<Table3D name="Dc" x_file="x" y_file="y" z_file="z" voxel_file="Dc"/>
+ 	<Table3D name="alpha" x_file="x" y_file="y" z_file="z" voxel_file="alpha"/>
+ 	<Table3D name="shearRateStar" x_file="x" y_file="y" z_file="z" voxel_file="shearRateStar"/>
+ 	<Table3D name="shearSlipRateAB" x_file="x" y_file="y" z_file="z" voxel_file="shearSlipRateAB"/>
+ 	<Table3D name="stateStar" x_file="x" y_file="y" z_file="z" voxel_file="stateStar"/>
+ 	<Table3D name="shearRateDrive" x_file="x" y_file="y" z_file="z" voxel_file="shearRateDrive"/>
+  </Tables>
+
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  writePlot="0" restart_interval="8e10" plotfile_root="ms" parallel_silo="1"/>
+
+</Problem>

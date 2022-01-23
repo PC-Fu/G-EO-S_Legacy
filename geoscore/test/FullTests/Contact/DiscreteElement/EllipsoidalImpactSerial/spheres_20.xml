@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Mesh ellipsoid_file="spheres_20"/>
+	
+  <Units length="mm" mass="mg" time="us" temperature="K" mole="mol" />
+
+  <Solvers>
+    <LagrangeLargeStrain name="solver1" courant="0.5" timeIntegrationOption="2"/>
+  </Solvers>
+
+  <ElementRegions>
+    <ElementRegion name="PM1" hgStiff="0.01" elementtype="uniformstrain"  hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="29.92" Density="2.65" BulkModulus="43.45"/>
+    </ElementRegion>
+  </ElementRegions>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="500.0" dt="0.05">
+      <Apply solver="solver1" toregions="PM1"/>
+    </Application>  
+  </SolverApplications>
+
+  <Contact active="1" >
+    <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="5.0e-3" />
+  </Contact>
+
+  <EllipsoidalDEM>
+    <Hertzian frictionCoefficient="0.0"/>
+  </EllipsoidalDEM>
+
+  <InitialConditions>          
+  	<ConstantInitialCondition setnames="1" fieldname="Velocity" fieldtype="Vector" object="EllipsoidalDiscreteElement" value="0 0.001 0"/>
+  </InitialConditions>
+  
+  <Partition>
+    <SpatialPartition xpar="1" ypar="1" zpar="1" />
+  </Partition>
+    
+  <Output  plot_interval="1.00" plotfile_root="testspheres" parallel_silo="1"/>
+
+</Problem>

@@ -1,0 +1,19 @@
+
+<Parameters>
+  <Parameter name="SolidDensity"      value="2650 kg/m^3" />
+  <Parameter name="SolidBulkModulus"  value="8.33333 MPa" />
+  <Parameter name="SolidShearModulus" value="3.84615 MPa" />
+  <Parameter name="deltaTime"         value="0.005 s" />
+  <Parameter name="endTime"           value="0.01 s"/>
+</Parameters>
+
+<Solvers>
+  <ImplicitMechanicsSolver3D name="implag" 
+                             tol="1e-10" />
+
+  <LagrangeSmallStrainLinearElastic name="implag2" 
+                                    tol="1e-16"
+				    useMLPrecoditioner="0"/>
+
+</Solvers>
+

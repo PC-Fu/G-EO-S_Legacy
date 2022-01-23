@@ -1,0 +1,17 @@
+reset
+brick x 20 y 2 z 2
+volume 1 size 0.2
+volume 1  scheme Tetmesh
+mesh volume 1 
+
+set duplicate block elements off
+block 1 volume all
+
+nodeset 1 surface 4  
+nodeset 2 surface 6
+
+set Abaqus precision 6
+export Abaqus "CantileverBeamTet.abq" Block all Nodeset all dimension 3 everything overwrite cubitids 
+
+
+

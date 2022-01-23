@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!-- 
+-->
+<!--# This simulations tests the porous medium flow model that has been coupled into the explicit hydraulic fracturing model.
+Because we need to obtain the leak-off rate which is only calculated when the solver is called by the hydraulic fracture solver, we have to do the test within the hydraulic fracture solver.
+All the nodes are mechanically fixed and there is only one flow face, so the lagrange solver and the pp solver have no effects.
+The calculation of the equivalent Carter's leak-off coefficient is in the doc repo.  This model can be approxiately by the Carter's model before the pressure fronts hit the boundary.
+ #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="geos_v0.0.xsd">
+
+<Solvers>
+    <Hydrofracture name="hf1" 
+		   timeIntegration="Explicit"
+		   ppSolverName="ppsolve"
+		   lgSolverName="lagsolve"
+		   mfSolverName="mfsolve"
+		   dtMatrixFlow="1.0"
+    />
+<!--  The matrix flow solver is implicit and the time step must be explicitly specified. The specified value can be moderately large, depending on how fast the leak-off takes place, but if it is too big, GEOS will crash with an error message saying so.  -->
+
+    <LagrangeLargeStrain name="lagsolve" 
+			 courant="1e6" 
+			 timeIntegrationOption="2"
+			 dampingM="3000"/>
+
+    <ParallelPlateFlowSolver name="ppsolve"
+			     BulkModulus="10.0e6" 
+			     ppcourant = "1e6"
+			     mu="0.001"
+			     BartonJointParameters="3e-4 5e6 1e-4"
+			     MaximumAperture="4.0e-3"
+			     pressurecap="4e6"/>
+			     
+<!--  Hugh courant factors are used because these two solvers have no effects.  Actually, dt is explicitly given below.  The courant factors have no effects.  -->
+			     
+
+     <MatrixFlowSolver name="mfsolve"
+                       timeIntegration="Implicit"
+                       matrixRegionName="Region" 
+                       fieldName="Pressure"
+                       pressRef="0.0" 
+                       rockCompress="0.0"
+                       nrMaxIterations="100"
+                       nrTol="0.1"
+                       fluidCompress="0.253e-9"/>
+
+ </Solvers>
+
+
+  <Mesh 
+    xcoords="-100 100"
+    ycoords="0 1.8"
+    zcoords="0 3.2"
+	nx="122"
+	ny="1"
+	nz="1" 
+	elementType="C3D8"
+    regionNames="Region"
+	/>
+
+
+  <Nodesets>
+        <Nodeset name="crack"         type="0" xmin="-0.1 -0.1 -0.1" xmax="0.1 1.9 3.3"/>
+  </Nodesets>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="6000" dt="1.0">
+      <Apply solver="hf1" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="Region" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="16.667e9" Density="50000" BulkModulus="22.222e9" />
+    </ElementRegion>
+
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="1" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="2" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Face" fieldname="Pressure" setnames="crack" scale="2e6"/>
+  <MultiVarDirichletBoundaryCondition object="Node" fieldname="MultiVars" setnames="xpos" varName="Pressure" isClamped="1" scale="1e6" />
+
+</BoundaryConditions>
+
+
+<Tables>
+    <Table1D name="ttable" coord = "0.0, 1200"   value = "1.0,1.0" />
+</Tables>
+
+
+
+
+  <InitialConditions>
+
+    <ConstantInitialCondition fieldname="Pressure" fieldtype="Scalar" object="Node" value="1e6" />
+
+    <ConstantInitialCondition fieldname="Permeability" fieldtype="Scalar" object="Element" toregions="Region" value="3.654e-14" />
+
+    <ConstantInitialCondition fieldname="Porosity" fieldtype="Scalar" object="Element" toregions="Region" value="0.05" />
+
+  </InitialConditions>
+
+
+<Partition>
+  <SpatialPartition xpar="4" ypar="1" zpar="1" />
+</Partition>
+    
+
+  <Fracture fractureFlag="20000"
+	        preFractureSetName="crack"
+            separableSet=""
+            rockToughness="1e100"
+            failCriterion="1"
+	        failgap="0.0004"
+
+  />    
+<Output  writePlot="0" writeRestart="1" restart_interval="3000.0" plot_interval="100" 
+         plotfile_root="singlecolumnP" parallel_silo="1" 
+         writeFEMFaces="1" writeFEMEdges="0"/>
+
+</Problem>
+
+

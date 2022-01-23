@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+
+  <!-- GPAC.x -i SubstepTest.xml -->
+
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+ <!--<Parameter meshFile="../Aperture.inp"/>-->
+ <Parameter meshFile="ApertureSmall.inp"/> 
+
+  <Solvers>            
+ 
+      <!--Dummy we need something here for simulation to run-->
+      <DisSolver name="dissolverUpper"
+                 function="dissolverTest"
+                 variables="ReferencePosition"
+                 variableTypes="Vector"
+                 faceSet = "Zmax"/>
+
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1s" dt="1s">
+       <!-- <Apply solver="infrequentSolver" toregions="someRegion" /> -->
+       <Substep dt="0.1s">
+         <!-- <Apply solver="anotherSolver" toregions="someRegion" /> -->
+         <Substep dt="0.02s">
+           <!-- <Apply solver="frequentSolver" toregions="someRegion" /> -->
+         </Substep>
+       </Substep>
+    </Application> 
+  </SolverApplications>
+
+
+  <Mesh file="$:meshFile"/>
+
+  <Output plot_interval="10s" />
+</Problem>

@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<Problem>
+  <Include file="line.xml"/>
+
+  <Solvers>
+    <Hydrofracture name="hfsolve" 
+                   tol="1e-12"
+		   useMLPrecoditioner="0"/>
+  </Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="1.0">
+      <Apply solver="hfsolve" toregions="Region"/>
+    </Application>  
+
+  </SolverApplications>
+
+  <BoundaryConditions>
+
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="ypos" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="0" scale="0.0" fieldtype="Vector" />
+    <BoundaryCondition  object="Node" fieldname="Velocity" setnames="all" component="2" scale="0.0" fieldtype="Vector" />
+
+  </BoundaryConditions>
+
+  <Output  writePlot="0"
+	   plot_interval="1.0" 
+	   restart_interval="0.1"
+	   plotfile_root="test" 
+	   writeFEMFaces="1" 
+	   writeFEMEdges="1" 
+	   parallel_silo="1" />
+</Problem>

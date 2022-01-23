@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<!-- 
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="gpac.xsd">
+
+  <Include file="../../LagrangeSolvers.xml"/>
+
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="2.0" dt="1.0 s">
+      <Apply solver="implag2d" toregions="EB1"/>
+    </Application>  
+  </SolverApplications>
+
+  <ElementRegions>
+    <ElementRegion name="EB1" elementtype="poly" >
+        <LinearElasticMaterial ShearModulus="$:SolidShearModulus"  Density="$:SolidDensity" BulkModulus="$:SolidBulkModulus" />
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <TractionBoundaryCondition object="Node" setnames="NS2" 
+	                     direction="0.0 -1 0.0" 
+			     scale="1000 Pa"
+			     timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="NS1" component="0" scale="0.0" fieldtype="Vector" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="NS1" component="1" scale="0.0" fieldtype="Vector" />
+</BoundaryConditions>
+
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 10.0"
+           value = "0.0, 1.0" />
+</Tables>
+
+
+  <Mesh file="../CantileverBeamQuad.abq" />
+
+
+
+
+
+<Partition>
+  <SpatialPartition xpar="1" ypar="1" zpar="1" />
+</Partition>
+    
+<Output  writePlot="0" restart_interval="1.0" plotfile_root="plot" parallel_silo="1"/>
+
+</Problem>

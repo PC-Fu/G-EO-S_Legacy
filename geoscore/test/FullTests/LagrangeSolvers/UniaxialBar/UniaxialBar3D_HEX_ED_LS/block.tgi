@@ -1,0 +1,41 @@
+partmode i
+
+
+parameter
+nelems 1
+;
+
+
+
+block
+[1*%nelems] [1*%nelems] ; 
+[1*%nelems]; 
+[1*%nelems]; 
+-2.0 0.0 2.0;
+-1.0 1.0;
+-1.0 1.0;
+mate 1
+
+
+ NSETI 1 2;;;= left
+ NSETI 2 3;;;= right
+
+ NSETI -1;;;= xneg
+ NSETI -3;;;= xpos
+ NSETI ;-1;;= yneg
+ NSETI ;-2;;= ypos
+ NSETI ;;-1;= zneg
+ NSETI ;;-2;= zpos
+ NSETI ;;;= allnodes 
+
+
+endpart
+
+merge
+
+NDIGITS 14
+mof testblock01.geom
+abaqus
+write
+
+c exit

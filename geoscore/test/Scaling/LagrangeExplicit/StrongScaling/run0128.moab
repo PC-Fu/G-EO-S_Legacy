@@ -1,0 +1,15 @@
+#!/bin/csh
+#MSUB -N NSGPSF_ss
+#MSUB -l walltime=00:04:00
+#MSUB -l nodes=8
+#MSUB -l partition=hera
+#MSUB -q pbatch
+#MSUB -A ees
+#MSUB -r n
+#MSUB -m be
+
+cd /p/lscratchc/settgast/scaling/explicit_lagrange/strongScaling
+
+  srun -n 128 -N 8 /g/g15/settgast/GPAC/gcc/trunk/src/GPAC.x -f testblock_0128 -m ../testblock_18.geom 
+
+

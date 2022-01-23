@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<!-- 
+-->
+<!--#  #-->
+<Problem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="gpac.xsd">
+  <Units length="m" mass="kg" time="s" temperature="K" mole="mol" />  
+  <Mesh 
+    externalMeshFile="0"
+	xcoords="0 1"
+	ycoords="0 1"
+	nx="2"
+	ny="2"
+	elementType="CPE4"
+        regionNames="Region"
+	/>
+
+<Solvers>
+  <LagrangeSmallStrainLinearElastic name="implag2" 
+                                    tol="1e-08"
+				    useMLPreconditioner="1"
+				    useDirectSolver="1"
+       			            useNewtonSolve="1"
+				    tolNewton="1e-16"/>
+
+</Solvers>
+
+  <SolverApplications>
+    <Application name="1" begintime="0.0" endtime="10.0" dt="1">
+      <Apply solver="implag2" toregions="Region"/>
+    </Application>  
+  </SolverApplications>
+
+
+  <Contact active="1"
+           ImplicitActive="1"
+	   ThreeDTrue="0"
+	   NitscheFlag="1"
+	   NitscheTau1Flag="1"
+           slidingLaw="2"
+           FrictionCoefficient="0.1"
+           TractionCutoff="0.1">
+  <PenaltyCoulomb stressYield="100 GPa" normalApproachYield="4.99e-3" aperture="0.00" />
+  </Contact>
+
+  <ElementRegions>
+    <ElementRegion name="Region" hgStiff="0.01" elementtype="poly" hgDamp="0.1">
+        <LinearElasticMaterial ShearModulus="3.84615384615e09" Density="1" BulkModulus="8.333333333333333e09"/>
+    </ElementRegion>
+  </ElementRegions>
+
+
+
+<BoundaryConditions>
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos" component="1" scale="-0.1" fieldtype="Vector" timetable="ttable"/>
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="ypos" component="0" scale="0.1" fieldtype="Vector" timetable="ttable" />
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="0" scale="0.0" fieldtype="Vector" timetable="ttable"/>
+  <BoundaryCondition  object="Node" fieldname="Displacement" setnames="yneg" component="1" scale="0.0" fieldtype="Vector" timetable="ttable"/>
+
+</BoundaryConditions>
+
+  <InitialConstitutiveValues>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="BulkModulus" tablename="BulkModulus" toregion="Region"/>
+    <InitialConstitutiveValue object="FiniteElement_ElementRegion" propertytype="ShearModulus" tablename="ShearModulus" toregion="Region"/>
+  </InitialConstitutiveValues>
+
+<Tables>
+  <Table1D name="ttable" 
+           coord = "0.0, 5.0, 10.0"
+           value = "0.0, 1.0,  0.0" />
+    <Table3D name="BulkModulus" x_file="MaterialAndVoxel/x" y_file="MaterialAndVoxel/y" z_file="MaterialAndVoxel/z" voxel_file="MaterialAndVoxel/BulkModulus"/>
+    <Table3D name="ShearModulus" x_file="MaterialAndVoxel/x" y_file="MaterialAndVoxel/y" z_file="MaterialAndVoxel/z" voxel_file="MaterialAndVoxel/ShearModulus"/>
+</Tables>
+
+<Partition>
+  <SpatialPartition xpar="1" ypar="1" zpar="1" />
+</Partition>
+
+  <Fracture fractureFlag="1"
+            failCriterion="0"
+            failstress="1e100"
+	    x1_PreFrac="0.0"
+            y1_PreFrac="0.5"
+            z1_PreFrac="0"
+            x2_PreFrac="1.0"
+            y2_PreFrac="0.5"
+	    z2_PreFrac="0"
+	    failgap="0.0004"
+	    verbose="1" 	          	    
+     	    maxKinkAngle = "134.0"
+            maxTurnAngle = "100"/>
+
+    
+<Output  writePlot="0" writeRestart="1" restart_interval="5" writeFEMFaces="1" plot_interval="25" plotfile_root="Penalty" parallel_silo="1"/>
+
+</Problem>
+

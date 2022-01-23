@@ -1,0 +1,20 @@
+#!/bin/csh
+#MSUB -N NSGPSF_ss
+#MSUB -l walltime=00:4:00
+#MSUB -l nodes=43
+#MSUB -l partition=sierra
+#MSUB -q pbatch
+#MSUB -A clbdivp
+#MSUB -r n
+#MSUB -m be
+
+cd /p/lscratchc/settgast/scaling/explicit_lagrange/strongScaling
+
+#  srun -n 8  -N 1 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 2 -ypar 2 -zpar 2
+#  srun -n 16 -N 2 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 4 -ypar 2 -zpar 2
+#  srun -n 32 -N 3 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 4 -ypar 4 -zpar 2
+#  srun -n 64 -N 6 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 4 -ypar 4 -zpar 4
+  srun -n 128 -N 11 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 8 -ypar 4 -zpar 4
+  srun -n 256 -N 22 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 8 -ypar 8 -zpar 4
+  srun -n 512 -N 43 /g/g15/settgast/GPAC/trunk/src/GPAC.x -i testblock.xml -m ../testblock_18.geom -xpar 8 -ypar 8 -zpar 8
+
